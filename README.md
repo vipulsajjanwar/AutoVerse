@@ -1,18 +1,48 @@
-# AutoVerse
-💻 A full-stack Test Automation Framework for Web, API, Database, and Log Monitoring — powered by Selenium, TestNG, REST Assured, Docker, Selenium Grid, and Elastic Stack (Elasticsearch &amp; Kibana).
+# 🚀 AutoVerse
 
-This project is a robust and scalable Test Automation Framework designed for end-to-end validation of modern applications. It supports:
+💻 **A Full-Stack Test Automation Framework** for Web, API, Database, and Log Monitoring — powered by **Selenium**, **TestNG**, **REST Assured**, **Docker**, **Selenium Grid**, and **Elastic Stack (Elasticsearch & Kibana)**.
 
-Web UI automation using Selenium and TestNG
+![AutoVerse Demo](docs/demo.gif) <!-- Replace with your actual demo GIF path -->
 
-API testing using REST Assured
+---
 
-Database validation with JDBC integration
+## 🧰 Key Features
 
-Real-time log analysis via Elasticsearch & Kibana
+- ✅ Web UI Automation with **Selenium + TestNG**
+- 🔁 API Testing using **REST Assured**
+- 🗃️ Database Validation via **JDBC**
+- 📊 Real-Time Log Monitoring with **Elasticsearch & Kibana**
+- 🐳 Dockerized Selenium Grid for **Parallel Execution**
+- 🔄 CI/CD Ready: **Jenkins & GitHub Actions**
+- 📈 Unified Reporting (ExtentReports, HTML, Log4j)
+- 🔐 Secure config handling with `.properties`
 
-Parallel execution using Selenium Grid on Docker containers
+---
 
-CI/CD readiness for seamless integration with Jenkins and GitHub Actions
+## 🧱 Architecture Overview
 
-Ideal for teams aiming to implement enterprise-grade test automation with unified test reporting, logging, and monitoring.
+```mermaid
+graph TD
+    LocalMachine[Local Machine / CI Server] --> TestNG
+    TestNG --> SeleniumWebDriver[Selenium WebDriver]
+    TestNG --> RestAssured[REST Assured]
+    TestNG --> JDBC[JDBC]
+    SeleniumWebDriver --> WebApp[Web Application]
+    RestAssured --> API[REST APIs]
+    JDBC --> Database
+    TestNG --> LogGen[Log Generator]
+    LogGen --> Elasticsearch
+    Elasticsearch --> Kibana
+    SeleniumWebDriver --> SeleniumGrid[Selenium Grid on Docker]
+
+    TestNGTests[TestNG Test Classes] -->|Calls| PageObjects
+    PageObjects -->|Uses| WebElements
+    PageObjects --> Utils[Utility Classes]
+    PageObjects --> Config[ConfigManager]
+    PageObjects --> Actions[Reusable Actions]
+    Utils --> Logger[Logging Utility]
+    Config --> PropertiesFile[.properties Reader]
+    Actions --> WebDriverManager
+    WebDriverManager --> DriverFactory
+    DriverFactory --> SeleniumGrid[Selenium Grid / Local Driver]
+
