@@ -1,0 +1,103 @@
+# To execute this docker-compose yml file use:
+#   docker-compose -f docker-compose-grid.yaml up
+# Add the `-d` flag for detached execution
+# To stop: Ctrl+C and then `docker-compose -f docker-compose-grid.yaml down`
+
+version: '3.8'
+
+services:
+
+  selenium-hub1:
+    image: selenium/hub:latest
+    container_name: selenium-hub1
+    mem_limit: 1g
+    cpus: '1.0'
+    ports:
+      - "4442:4442"   # Event Bus Publish
+      - "4443:4443"   # Event Bus Subscribe
+      - "4444:4444"   # UI and session creation
+    networks:
+      - grid
+    environment:
+      - SE_SESSION_REQUEST_TIMEOUT=300
+      - SE_SESSION_RETRY_INTERVAL=2
+    volumes:
+      - selenium_hub_logs:/var/log/selenium
+    restart: unless-stopped
+
+  chrome1:
+    image: selenium/node-chrome:latest
+    container_name: chrome-node1
+    shm_size: 2gb  # Shared memory for Chrome stability
+    depends_on:
+      - selenium-hub1
+    ports:
+      - "5900:5900"   # VNC access (optional)
+    networks:
+      - grid
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub1
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_NODE_SESSION_TIMEOUT=300
+      - VNC_PASSWORD=admin@123
+      - TZ=Asia/Kolkata
+      - SE_NODE_GRID_URL=http://selenium-hub1:4444
+      - SE_DOWNLOAD_DIR=/home/seluser/Downloads
+    volumes:
+      - ./src/Downloads:/home/seluser/Downloads   # Download path
+      - /dev/shm:/dev/shm                          # Prevent Chrome crashes
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2g
+        reservations:
+          cpus: '0.5'
+          memory: 512m
+    restart: on-failure
+ 
+  chrome2:
+    image: selenium/node-chrome:latest
+    container_name: chrome-node2
+    shm_size: 1gb  # Shared memory for Chrome stability
+    depends_on:
+      - selenium-hub1
+    ports:
+      - "6900:6900"   # VNC access (optional)
+    networks:
+      - grid
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub1
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+      - SE_NODE_SESSION_TIMEOUT=300
+      - VNC_PASSWORD=admin@123
+      - TZ=Asia/Kolkata
+      - SE_NODE_GRID_URL=http://selenium-hub1:4444
+      - SE_DOWNLOAD_DIR=/home/seluser/Downloads
+    volumes:
+      - ./src/Downloads:/home/seluser/Downloads   # Download path
+      - /dev/shm:/dev/shm                          # Prevent Chrome crashes
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2g
+        reservations:
+          cpus: '0.5'
+          memory: 512m
+    restart: on-failure
+
+networks:
+  grid:
+    driver: bridge
+
+volumes:
+  selenium_hub_logs:
+  chrome_downloads:
+
