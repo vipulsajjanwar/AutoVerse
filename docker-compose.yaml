@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  selenium-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    container_name: ${CONTAINER_NAME}
+    mem_limit: 3g
+    mem_reservation: 1g
+    cpus: '2.5'
+    hostname: docker-host
+    working_dir: /app
+    volumes:
+      - ~/.m2:/root/.m2
+      - .:/app
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    stdin_open: true
+    tty: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file: .env
+    environment:
+      - TZ=Asia/Kolkata
+    command: >
+      bash -c "mvn clean test -Dmaven.test.failure.ignore=true
+      -DJworkspaceName='${JWORKSPACE_NAME}'
+      -Djexecutiontype='${JEXECUTION_TYPE}'
+      -DJexecutionkey='${JEXECUTION_KEY}'
+      -Djforkcounts='${JFORK_COUNTS}'
+      -DjelkFlag='${JELK_FLAG}'
+      -DJconfigColumnName='${JCONFIG_COLUMN_NAME}'
+      -DapplicationURL='${APPLICATION_URL}'
+      -DJexeMessage='${JEXE_MESSAGE}'
+      -DjbuildID='${JBUILD_ID}'
+      -Dsurefire.suiteXmlFiles='${XSUREFIRE_XML}'"
