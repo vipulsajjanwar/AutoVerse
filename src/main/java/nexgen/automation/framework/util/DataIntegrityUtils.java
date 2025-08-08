@@ -248,31 +248,5 @@ public class DataIntegrityUtils {
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
-	
-	public static String humanReadableByteCountSI(long bytes) {
-
-		if (bytes < 1000) {
-			// Round up even small values to one decimal place
-			double kb = Math.ceil((bytes / 1024.0) * 10) / 10.0;
-			return String.format("%.1f KB", kb);
-		}
-		int exp = (int) (Math.log(bytes) / Math.log(1024));
-		String pre = "kMGTPE".charAt(exp - 1) + "";
-
-		double value = bytes / Math.pow(1024, exp);
-		value = Math.ceil(value * 10) / 10.0;  // Round up to 1 decimal place
-
-		return String.format("%.1f %sB", value, pre);
-	}
-
-	public static long convertToBytes(String sizeStr) {
-		sizeStr = sizeStr.trim().toUpperCase().replaceAll("[^0-9. KMGTPEB]", "");
-		double size = Double.parseDouble(sizeStr.replaceAll("[^0-9.]", ""));
-		if (sizeStr.contains("KB")) return (long) (size * 1024);
-		if (sizeStr.contains("MB")) return (long) (size * 1024 * 1024);
-		if (sizeStr.contains("GB")) return (long) (size * 1024 * 1024 * 1024);
-		if (sizeStr.contains("B"))  return (long) size;
-		return -1;
-	}
 }
 
