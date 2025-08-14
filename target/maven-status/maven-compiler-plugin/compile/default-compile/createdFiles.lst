@@ -1,9 +1,12 @@
 com\framework\integration\JiraIntegration.class
 com\automation\webpages\HomePage.class
+com\framework\enums\Tests.class
 com\framework\utils\XLUtil.class
 com\framwork\pojo\RequestPayLoads.class
 com\framework\report\GenerateReport.class
+com\framework\enums\Pages.class
 com\framwork\pojo\Root.class
+com\framework\enums\Report.class
 com\framework\report\TestListener.class
 com\framwork\pojo\Info.class
 com\framework\utils\PageUtil.class
@@ -22,6 +25,8 @@ com\framework\base\BaseClass.class
 com\framework\config\ReadConfig.class
 com\framework\restassured\RestAPI.class
 com\framework\integration\XrayIntegration.class
+com\framework\enums\Execution.class
+com\framework\integration\EmailIntegration$1.class
 com\framwork\pojo\ConnectionProperty.class
 com\framework\utils\DataIntegrityUtil.class
 com\framework\utils\DBUtil.class
