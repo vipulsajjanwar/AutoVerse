@@ -17,9 +17,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
-
-
 public class PageUtil {
 
 	protected static final Properties prop = new Properties();
@@ -47,9 +44,9 @@ public class PageUtil {
 		return wait;
 	}
 
-	public static void beforesuite() {
+	public static void beforesuite(String locatorsFolderPath) {
 
-		File folder = new File(DIR_PATH + "/src/main/resources/locators/");
+		File folder = new File(locatorsFolderPath);
 		File[] listOfFiles = folder.listFiles();
 
 		for (int i = 0; i < listOfFiles.length; i++) {
@@ -58,7 +55,7 @@ public class PageUtil {
 
 				Properties prop2 = new Properties();
 
-				File src = new File(DIR_PATH + "/src/main/resources/locators/" + listOfFiles[i].getName());
+				File src = new File(locatorsFolderPath + listOfFiles[i].getName());
 
 				try (FileInputStream fis = new FileInputStream(src);){
 

@@ -1,0 +1,91 @@
+version: "3.8"
+
+services:
+  hub:
+    image: selenium/hub:latest
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
+        reservations:
+          cpus: '0.5'
+          memory: 512m
+    ports:
+      - target: 4444
+        published: 4444
+        protocol: tcp
+        mode: host
+    environment:
+      - SE_GRID_MAX_SESSION=6
+      - SE_GRID_SESSION_TIMEOUT=300
+      - SE_OPTS=--relax-checks true
+    networks:
+      - grid
+
+  chrome:
+    image: selenium/node-chrome:latest
+    deploy:
+      replicas: 4
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2g
+        reservations:
+          cpus: '0.5'
+          memory: 1g
+      placement:
+        constraints: [node.role == manager]
+    depends_on:
+      - hub
+    environment:
+      - SE_EVENT_BUS_HOST=hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - VNC_PASSWORD=admin@123
+      - TZ=Asia/Kolkata
+      - SE_NODE_GRID_URL=http://hub:4444
+      - SE_DOWNLOAD_DIR=/home/seluser/Downloads
+    volumes:
+      - ./src/Downloads:/home/seluser/Downloads   # Bind mount for downloads
+      - /dev/shm:/dev/shm                          # Avoid Chrome crash
+      - ./src:/app/src                             # Bind mount for test code
+    networks:
+      - grid
+
+  firefox:
+    image: selenium/node-firefox:latest
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2g
+        reservations:
+          cpus: '0.5'
+          memory: 1g
+      placement:
+        constraints: [node.role == manager]
+    depends_on:
+      - hub
+    environment:
+      - SE_EVENT_BUS_HOST=hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - VNC_PASSWORD=admin@123
+      - TZ=Asia/Kolkata
+      - SE_NODE_GRID_URL=http://hub:4444
+      - SE_DOWNLOAD_DIR=/home/seluser/Downloads
+    volumes:
+      - ./src/Downloads:/home/seluser/Downloads   # Bind mount for downloads
+      - /dev/shm:/dev/shm                          # Avoid Firefox crash
+      - ./src:/app/src                             # Bind mount for test code
+    networks:
+      - grid
+
+networks:
+  grid:
+    driver: overlay

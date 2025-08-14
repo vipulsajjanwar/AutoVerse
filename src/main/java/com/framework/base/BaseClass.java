@@ -14,11 +14,12 @@ public class BaseClass{
 
 
 	public static final Logger log = Logger.getLogger(BaseClass.class);
+	public static final String DIR_PATH=System.getProperty("user.dir");
 		
 	@BeforeSuite(alwaysRun=true)
 	public void beforeTestSuite() {
 		
-		PageUtil.beforesuite();
+		PageUtil.beforesuite(DIR_PATH + "/src/main/resources/locators/");
 		
 	
 		

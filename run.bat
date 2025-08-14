@@ -80,10 +80,6 @@ echo %LOG_INFO% Initializing WSL...
 wsl echo "WSL ready"
 timeout /t 2 >nul
 
-:: ========== Start Grid ==========
-echo.
-echo %LOG_INFO% Starting Docker Selenium Grid...
-wsl bash -c "cd '%WSL_PATH%' && docker-compose -f docker-compose-grid.yaml up -d"
 
 :: ========== Check Docker Image ==========
 echo.

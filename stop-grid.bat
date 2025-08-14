@@ -27,8 +27,12 @@ wsl echo "WSL initialized."
 REM Step 6: Wait for WSL to warm up
 timeout /t 3 >nul
 
+
+wsl bash -c "cd '%WSL_PATH%' && echo 'Running docker-compose file...' && docker stack rm sel && echo 'Docker grid containers stopped.'"
+
 REM Step 7: Run docker-compose with two files
 wsl bash -c "cd '%WSL_PATH%' && echo 'Running docker-compose file...' && docker-compose -f docker-compose-grid.yaml down && echo 'Docker grid containers stopped.'"
+
 
 echo.
 echo Done.
