@@ -4,9 +4,10 @@ import org.apache.log4j.Logger;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
-import org.testng.annotations.BeforeSuite;
 
 import com.framework.utils.PageUtil;
+
+
 
 
 public class BaseClass{
@@ -16,7 +17,7 @@ public class BaseClass{
 	public static final Logger log = Logger.getLogger(BaseClass.class);
 	public static final String DIR_PATH=System.getProperty("user.dir");
 		
-	@BeforeSuite(alwaysRun=true)
+	
 	public void beforeTestSuite() {
 		
 		PageUtil.beforesuite(DIR_PATH + "/src/main/resources/locators/");
@@ -26,13 +27,6 @@ public class BaseClass{
 		
 	}
 	
-	
-	
-	
-	
-	
-	
-
 	public static void handleExceptions(Exception e) {
         if (e instanceof NoSuchElementException) {
         	log.error("Element not found", e);
