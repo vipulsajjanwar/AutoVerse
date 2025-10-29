@@ -4,6 +4,7 @@ com\framework\utils\XLUtil.class
 com\framework\ai\AIScriptGenerator$1.class
 com\framework\report\GenerateReport.class
 com\framework\enums\Pages.class
+com\framework\ai\CodeGenerator.class
 com\framework\constant\SqlQueries.class
 com\framework\constant\ApiConstants.class
 com\framework\integration\EmailIntegration.class
@@ -27,16 +28,19 @@ com\framwork\pojo\Info.class
 com\framework\ai\AIScriptGenerator.class
 com\framework\constant\JsonPathConstants.class
 com\framework\utils\PageUtil.class
+com\framework\ai\CodeGenController.class
 com\framework\utils\APIUtil.class
 com\automation\webpages\LoginPage.class
 com\framework\constant\DefaultValues.class
 com\framework\utils\JsonUtil.class
 com\framework\utils\TimeUtil.class
+com\framework\ai\CodeGenWebApp.class
 com\framework\constant\LogMessages.class
 com\framework\constant\Constant.class
 com\framework\utils\ELKUtil.class
 com\framework\base\BaseClass.class
 com\framework\restassured\RestAPI.class
+com\framework\ai\CodeGenService.class
 com\framework\integration\XrayIntegration.class
 com\framwork\pojo\ConnectionProperty.class
 com\framework\config\ConfigManager.class

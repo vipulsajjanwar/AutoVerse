@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Code Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      background: #f5f7fa;
+    }
+    h2 {
+      color: #333;
+    }
+    textarea, input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 15px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    #result {
+      margin-top: 25px;
+      padding: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+<h2>💡 AI Code Generator</h2>
+
+<label>Prompt:</label>
+<textarea id="prompt" rows="6" placeholder="Describe what code you want..."></textarea>
+
+<label>Output File Path:</label>
+<input id="path" type="text" placeholder="e.g. D:/generated/MyClass.java">
+
+<button onclick="generate()">Generate Code</button>
+
+<div id="result"></div>
+
+<script>
+async function generate() {
+  const prompt = document.getElementById('prompt').value;
+  const path = document.getElementById('path').value;
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = "⏳ Generating...";
+
+  const response = await fetch(`/api/generate?prompt=${encodeURIComponent(prompt)}&path=${encodeURIComponent(path)}`, {
+    method: 'POST'
+  });
+  const text = await response.text();
+  resultDiv.innerHTML = text;
+}
+</script>
+</body>
+</html>
