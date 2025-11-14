@@ -37,6 +37,9 @@ import com.framwork.pojo.Info;
 import com.framwork.pojo.RequestPayLoads;
 import com.framwork.pojo.ServerConfig;
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -471,6 +474,67 @@ public class APIUtil {
 
 		return requestbody;
 
+	}
+
+	// Create request with JSON + Basic Auth + Optional Headers
+	private static RequestSpecification createRequest(String username, String password, Map<String, String> headers) {
+
+		RequestSpecification request = RestAssured.given()
+				.auth().preemptive().basic(username, password)
+				.contentType(ContentType.JSON)
+				.accept(ContentType.JSON);
+
+		if (headers != null) {
+			request.headers(headers);
+		}
+
+		return request;
+	}
+
+	// ----------------------------- GET -----------------------------
+	public static io.restassured.response.Response get(String url, String username, String password, Map<String, String> headers) {
+
+		return createRequest(username, password, headers)
+				.when()
+				.get(url)
+				.then()
+				.extract()
+				.response();
+	}
+
+	// ----------------------------- POST -----------------------------
+	public static io.restassured.response.Response post(String url, Object body, String username, String password, Map<String, String> headers) {
+
+		return createRequest(username, password, headers)
+				.body(body)
+				.when()
+				.post(url)
+				.then()
+				.extract()
+				.response();
+	}
+
+	// ----------------------------- PUT -----------------------------
+	public static io.restassured.response.Response put(String url, Object body, String username, String password, Map<String, String> headers) {
+
+		return createRequest(username, password, headers)
+				.body(body)
+				.when()
+				.put(url)
+				.then()
+				.extract()
+				.response();
+	}
+
+	// ----------------------------- DELETE -----------------------------
+	public static io.restassured.response.Response delete(String url, String username, String password, Map<String, String> headers) {
+
+		return createRequest(username, password, headers)
+				.when()
+				.delete(url)
+				.then()
+				.extract()
+				.response();
 	}
 
 }
