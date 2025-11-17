@@ -3,6 +3,7 @@ package com.framwork.pojo;
 public class AuthConfig {
 	public String username;
 	public String password;
+	
 	public String getUsername() {
 		return username;
 	}

@@ -15,6 +15,7 @@ com\framwork\pojo\Responce.class
 com\framework\ai\WebServer.class
 com\framework\config\ReadConfig.class
 com\framework\enums\Execution.class
+com\framework\utils\ReportUtil.class
 com\framework\integration\EmailIntegration$1.class
 com\framework\utils\DataIntegrityUtil.class
 com\framework\utils\DBUtil.class
@@ -43,4 +44,7 @@ com\framework\restassured\RestAPI.class
 com\framework\ai\CodeGenService.class
 com\framework\integration\XrayIntegration.class
 com\framwork\pojo\ConnectionProperty.class
+com\framework\variables\ExecutionVariables.class
+com\framework\report\ExtentManager.class
+com\framework\utils\JsonUtil$1.class
 com\framework\config\ConfigManager.class

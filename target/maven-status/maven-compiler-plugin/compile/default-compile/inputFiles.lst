@@ -8,6 +8,8 @@ D:\Home\AutoVerse\src\main\java\com\automation\webpages\HomePage.java
 D:\Home\AutoVerse\src\main\java\com\framework\report\GenerateReport.java
 D:\Home\AutoVerse\src\main\java\com\automation\webpages\LoginPage.java
 D:\Home\AutoVerse\src\main\java\com\framework\restassured\RestAPI.java
+D:\Home\AutoVerse\src\main\java\com\framework\report\ExtentManager.java
+D:\Home\AutoVerse\src\main\java\com\framework\utils\ReportUtil.java
 D:\Home\AutoVerse\src\main\java\com\framwork\pojo\ServerConfig.java
 D:\Home\AutoVerse\src\main\java\com\framework\utils\APIUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\ai\WebServer.java
@@ -22,6 +24,7 @@ D:\Home\AutoVerse\src\main\java\com\framework\ai\CodeGenController.java
 D:\Home\AutoVerse\src\main\java\com\framework\constant\SqlQueries.java
 D:\Home\AutoVerse\src\main\java\com\framwork\pojo\Root.java
 D:\Home\AutoVerse\src\main\java\com\framework\ai\AIScriptGenerator.java
+D:\Home\AutoVerse\src\main\java\com\framework\variables\ExecutionVariables.java
 D:\Home\AutoVerse\src\main\java\com\framwork\pojo\Responce.java
 D:\Home\AutoVerse\src\main\java\com\framework\ai\CodeGenService.java
 D:\Home\AutoVerse\src\main\java\com\framework\enums\Execution.java

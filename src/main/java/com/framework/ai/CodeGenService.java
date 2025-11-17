@@ -1,16 +1,19 @@
 package com.framework.ai;
 
-import com.openai.client.OpenAIClient;
-import com.openai.client.okhttp.OpenAIOkHttpClient;
-import com.openai.models.ChatModel;
-import com.openai.models.chat.completions.ChatCompletion;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import org.springframework.stereotype.Service;
+
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.springframework.stereotype.Service;
+
+import com.openai.client.OpenAIClient;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.models.ChatModel;
+import com.openai.models.chat.completions.ChatCompletion;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 
 @Service
 public class CodeGenService {
