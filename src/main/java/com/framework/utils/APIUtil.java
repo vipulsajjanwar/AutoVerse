@@ -27,7 +27,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +51,7 @@ public class APIUtil {
 
 	private APIUtil() {}
 
-	static final Logger log = Logger.getLogger(APIUtil.class);
+	static final Logger log = LoggerFactory.getLogger(APIUtil.class);
 
 	private static final String BEARER="Bearer ";
 	static final String AUTHORIZATION="Authorization";

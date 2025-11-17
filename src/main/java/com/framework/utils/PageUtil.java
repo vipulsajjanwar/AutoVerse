@@ -5,7 +5,8 @@ import java.io.FileInputStream;
 import java.time.Duration;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -17,14 +18,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 
-import com.framework.base.BaseClass;
-
-
 public class PageUtil {
 
 	protected static final Properties prop = new Properties();
 
-	static final Logger log = Logger.getLogger(PageUtil.class);
+	static final Logger log = LoggerFactory.getLogger(PageUtil.class);
 
 	public static final String DIR_PATH=System.getProperty("user.dir");
 
@@ -50,7 +48,7 @@ public class PageUtil {
 	public static void beforesuite(String locatorsFolderPath) {
 
 
-		File folder = new File(BaseClass.DIR_PATH+locatorsFolderPath);
+		File folder = new File(locatorsFolderPath);
 
 		File[] listOfFiles = folder.listFiles();
 

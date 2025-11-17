@@ -15,7 +15,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<forkcounts>1</forkcounts>
-		<selenium.version>4.32.0</selenium.version>
+		<selenium.version>4.25.0</selenium.version>
 		<testng.version>7.10.2</testng.version>
 		<webdrivermanager.version>5.7.0</webdrivermanager.version>
 
@@ -92,6 +92,12 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-reload4j</artifactId>
 			<version>2.0.17</version>
+			<exclusions>
+        <exclusion>
+            <groupId>ch.qos.reload4j</groupId>
+            <artifactId>reload4j</artifactId>
+        </exclusion>
+    </exclusions>
 		</dependency>
 
 		<!-- ================== Reporting ================== -->
@@ -103,6 +109,12 @@
 		<dependency>
 			<groupId>com.aventstack</groupId>
 			<artifactId>chaintest-testng</artifactId>
+			<version>1.0.12</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.aventstack</groupId>
+			<artifactId>chaintest-core</artifactId>
 			<version>1.0.12</version>
 		</dependency>
 
@@ -258,6 +270,12 @@
 			<version>3.3.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.31</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -271,6 +289,8 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<testSource>21</testSource>
+                	<testTarget>21</testTarget>
 				</configuration>
 			</plugin>
 

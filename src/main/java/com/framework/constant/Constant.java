@@ -7,7 +7,7 @@ import com.framework.config.ReadConfig;
 
 public class Constant {
 
-	private static ReadConfig readconfig = new ReadConfig(BaseClass.CONFIG_FILE);
+	private static ReadConfig readconfig = new ReadConfig(BaseClass.DIR_PATH+"/src/main/resources/config");
 		
 	// ---------------- Email Credentials ----------------
 

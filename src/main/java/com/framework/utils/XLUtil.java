@@ -19,7 +19,8 @@ import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
@@ -43,7 +44,7 @@ public class XLUtil {
 	static XSSFSheet ws;
 	static XSSFRow row;
 	static XSSFCell cell;
-	final static Logger log = Logger.getLogger(XLUtil.class);
+	final static Logger log = LoggerFactory.getLogger(XLUtil.class);
 
 	public static void setExcelWBook(InputStream excelFile) {
 		try {

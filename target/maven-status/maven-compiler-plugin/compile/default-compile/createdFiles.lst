@@ -10,6 +10,7 @@ com\framework\constant\ApiConstants.class
 com\framework\integration\EmailIntegration.class
 com\framework\utils\BaseUtil.class
 com\framwork\pojo\AuthConfig.class
+com\framework\report\CustomChainTestReport.class
 com\framework\report\WebEventListener.class
 com\framwork\pojo\Responce.class
 com\framework\ai\WebServer.class
@@ -22,6 +23,7 @@ com\framework\utils\DBUtil.class
 com\framwork\pojo\ServerConfig.class
 com\framework\integration\JiraIntegration.class
 com\framwork\pojo\RequestPayLoads.class
+com\framework\base\Launcher.class
 com\framwork\pojo\Root.class
 com\framework\enums\Report.class
 com\framework\report\TestListener.class

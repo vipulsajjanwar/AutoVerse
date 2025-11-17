@@ -20,13 +20,14 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.framework.utils.XLUtil;
 
 public class EmailIntegration {
 
-	final  Logger log = Logger.getLogger(EmailIntegration.class);
+	final  Logger log = LoggerFactory.getLogger(EmailIntegration.class);
 	
 	private EmailIntegration() {}
 	

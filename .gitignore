@@ -1,1 +1,7 @@
-/target/
+/reports
+.project
+.classpath
+/test-output
+/.settings
+/target
+src/main/resources/reportdoc/*

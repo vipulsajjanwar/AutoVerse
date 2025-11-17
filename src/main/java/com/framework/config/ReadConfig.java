@@ -4,15 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.framework.base.BaseClass;
 
 public class ReadConfig {
 	
 	Properties pro;
-	final  Logger log = Logger.getLogger(ReadConfig.class);
+	final  Logger log = LoggerFactory.getLogger(ReadConfig.class);
 	
 
 	public ReadConfig(String folderPath)

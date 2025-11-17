@@ -1,7 +1,8 @@
 package com.framework.utils;
 
 import java.util.Base64;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -12,7 +13,7 @@ import okhttp3.Response;
 public class ELKUtil {
 
 	private ELKUtil(){}
-	static final Logger log = Logger.getLogger(ELKUtil.class);
+	static final Logger log = LoggerFactory.getLogger(ELKUtil.class);
 
 	static boolean flag= false;
 	static String elkurl = "";
