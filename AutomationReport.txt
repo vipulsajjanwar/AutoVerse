@@ -1,0 +1,8 @@
+===== Test Suite Started: Login functionality testing =====
+
+Test Started: sum1
+PASSED: sum1
+Test Started: sum2
+FAILED: sum2 => java.lang.AssertionError: expected [9] but found [10]
+
+===== Suite Finished: Login functionality testing =====

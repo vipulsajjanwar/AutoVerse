@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" > 
+
+<suite name="Login_Test_Suite" parallel="tests" thread-count="1">
+
+	<parameter name="testType" value="ui" />
+	<parameter name="browser" value="chrome" />
+	<parameter name="applicationURL" value="https://192.168.100.76:32222/" />
+	<parameter name="userName" value="vipuls" />
+	<parameter name="password" value="Admin@123" />
+	<parameter name="executionKey" value="" />
+	<parameter name="moduleName" value="administration"/>
+	<parameter name="workspaceName" value="Automation_DND_2" /> 
+	<parameter name="suiteName" value="Login_Test_Suite"/>
+	
+	<test name="Login functionality testing">
+		
+		<classes>		
+			
+			<class name = "com.automation.testclasses.LoginPageTest">		
+						
+				<methods>
+									
+					<include name = "sum1"/>
+					<include name = "sum2"/>
+									
+				</methods>
+				
+		 	</class>	
+		 		
+		</classes>
+		
+	</test>
+	
+</suite>

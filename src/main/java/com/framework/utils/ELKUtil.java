@@ -1,18 +1,20 @@
 package com.framework.utils;
 
 import java.util.Base64;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+
 public class ELKUtil {
-	
+
 	private ELKUtil(){}
-	static final Logger log = Logger.getLogger(ELKUtil.class);
-	
+	static final Logger log = LoggerFactory.getLogger(ELKUtil.class);
+
 	static boolean flag= false;
 	static String elkurl = "";
 	static String elkusername= "";
@@ -20,53 +22,53 @@ public class ELKUtil {
 	static String indexType ="_doc";
 	static String datetimeFormat = "yyyy/MM/dd HH:mm:ss";
 	static String dateFormat = "yyyy/MM/dd";
-	
+
 	public static void sendDetailsToElk(String testCaseId, String requestBodyContent ) {
-		
+
 		try {
-			if(flag) {	
-				
-				String xrayid = testCaseId;
-								
-				String credentials = elkusername + ":" + elkpassword;
-				String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
-											
-				OkHttpClient client = new OkHttpClient().newBuilder().build();
+			if(!flag) {	}
 
-				MediaType mediaType = MediaType.parse(APIUtil.APPLICATION_JSON);
-				
-				RequestBody body = RequestBody.create(requestBodyContent, mediaType);
-				
-				String elkdocURL = elkurl+xrayid;
+			String xrayid = testCaseId;
 
-				log.info("ElasticSearch Request URL: "+elkdocURL);
-				log.info("ElasticSearch Request body: "+requestBodyContent);
-				
-				Request request = new Request.Builder()
+			String credentials = elkusername + ":" + elkpassword;
+			String encodedCredentials = Base64.getEncoder().encodeToString(credentials.getBytes());
 
-						.url(elkdocURL).method("POST", body)
+			OkHttpClient client = new OkHttpClient().newBuilder().build();
 
-						.addHeader("content-type", "application/json")
-						
-						.addHeader("Authorization", "Basic " + encodedCredentials)
+			MediaType mediaType = MediaType.parse(APIUtil.APPLICATION_JSON);
 
-						.build();
+			RequestBody body = RequestBody.create(requestBodyContent, mediaType);
 
-				Response response = client.newCall(request).execute();
+			String elkdocURL = elkurl+xrayid;
 
-				/**	Assert.assertEquals(response.code(), 201);*/
+			log.info("ElasticSearch Request URL: "+elkdocURL);
+			log.info("ElasticSearch Request body: "+requestBodyContent);
 
-				log.info("ElasticSearch Response code: "+response.code());
-				
-				String responseBody = response.body().string(); // Get the response body as a string
-				
-				log.info("ElasticSearch Response Body: " + responseBody);  // Log the response body
-			
-			}
+			Request request = new Request.Builder()
+
+					.url(elkdocURL).method("POST", body)
+
+					.addHeader("content-type", "application/json")
+
+					.addHeader("Authorization", "Basic " + encodedCredentials)
+
+					.build();
+
+			Response response = client.newCall(request).execute();
+
+			/**	Assert.assertEquals(response.code(), 201);*/
+
+			log.info("ElasticSearch Response code: "+response.code());
+
+			String responseBody = response.body().string(); // Get the response body as a string
+
+			log.info("ElasticSearch Response Body: " + responseBody);  // Log the response body
+
+
 		} catch (Exception e) {
 			log.info(e.getMessage());
 		}finally {
-			
+
 			log.info("");
 		}
 

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Test Script Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      width: 800px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+    }
+
+    label {
+      font-weight: bold;
+      color: #555;
+      margin-top: 15px;
+      display: block;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: vertical;
+    }
+
+    .button-group {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+
+    .copy-btn {
+      background: #28a745;
+    }
+    .copy-btn:hover {
+      background: #1e7e34;
+    }
+
+    h2 {
+      color: #444;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+
+    pre {
+      background: #1e1e1e;
+      color: #dcdcdc;
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: Consolas, monospace;
+      font-size: 14px;
+      max-height: 400px;
+    }
+
+    .copy-status {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 5px;
+      color: #28a745;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>⚡ AI Test Script Generator</h1>
+
+    <label for="prompt">📝 Enter your test prompt:</label>
+    <textarea id="prompt" placeholder="e.g. Login to app, enter username & password, click login"></textarea>
+
+    <label for="url">🌐 Enter Application URL:</label>
+    <input type="text" id="url" placeholder="https://example.com">
+
+    <label for="filename">📂 Enter File Name:</label>
+    <input type="text" id="filename" placeholder="MyTestScript.java">
+
+    <div class="button-group">
+      <button onclick="generateScript()">🚀 Generate Script</button>
+      <button onclick="resetForm()" style="background:#6c757d;">🔄 Reset</button>
+    </div>
+
+    <h2>📜 Generated Script:</h2>
+    <pre id="output">Your script will appear here...</pre>
+    
+    <div class="button-group">
+      <button class="copy-btn" onclick="copyToClipboard()">📋 Copy Script</button>
+    </div>
+    <p class="copy-status" id="copyStatus">✅ Script copied to clipboard!</p>
+  </div>
+
+  <script>
+    async function generateScript() {
+      const prompt = document.getElementById("prompt").value;
+      const url = document.getElementById("url").value;
+      const filename = document.getElementById("filename").value;
+
+      const response = await fetch("/generate-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, url, filename })
+      });
+
+      const data = await response.json();
+      document.getElementById("output").textContent = data.code || "❌ Error: Could not generate script";
+    }
+
+    function resetForm() {
+      document.getElementById("prompt").value = "";
+      document.getElementById("url").value = "";
+      document.getElementById("filename").value = "";
+      document.getElementById("output").textContent = "Your script will appear here...";
+      document.getElementById("copyStatus").style.display = "none";
+    }
+
+    function copyToClipboard() {
+      const output = document.getElementById("output").textContent;
+      const status = document.getElementById("copyStatus");
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(output).then(() => {
+          status.style.display = "block";
+          setTimeout(() => { status.style.display = "none"; }, 2000);
+        }).catch(err => {
+          console.error("Clipboard API failed: ", err);
+          fallbackCopy(output, status);
+        });
+      } else {
+        fallbackCopy(output, status);
+      }
+    }
+
+    function fallbackCopy(text, status) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        status.style.display = "block";
+        setTimeout(() => { status.style.display = "none"; }, 2000);
+      } catch (err) {
+        console.error("Fallback: Copy failed", err);
+        alert("⚠️ Could not copy script.");
+      }
+      document.body.removeChild(textarea);
+    }
+  </script>
+
+</body>
+</html>

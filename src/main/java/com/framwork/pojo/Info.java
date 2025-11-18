@@ -1,7 +1,7 @@
 package com.framwork.pojo;
 
 public class Info {
-
+	
 	public String host;
 	public String port;
 	public String getHost() {

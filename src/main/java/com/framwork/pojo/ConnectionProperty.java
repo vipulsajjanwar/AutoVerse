@@ -1,7 +1,7 @@
 package com.framwork.pojo;
 
 public class ConnectionProperty {
-
+	
 	public String name;
 	public String type;
 	public String value;
