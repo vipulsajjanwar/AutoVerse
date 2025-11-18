@@ -21,7 +21,8 @@ public class LoginPageTest extends BaseClass{
 	    	logTestInfo("sum1", "verify addition", "Arthmatic", "vipuls");
 	    	
 	        ChainTestListener.log("during test 1");
-	        assertEquals(10, Math.addExact(6, 4));
+	       assertEquals(10, Math.addExact(6, 4));
+	       
 	        ChainTestListener.log("during test 2");
 	        
 	    }
@@ -31,6 +32,9 @@ public class LoginPageTest extends BaseClass{
 	    	logTestInfo("sum2", "verify addition", "Arthmatic", "ashwind");
 	        ChainTestListener.log("during test 3");
 	        assertEquals(10, Math.addExact(5, 4));
+	        if(true) {
+	        	reportFailLog("Assertion failure", "sum2");
+	        }
 	        ChainTestListener.log("during test 4");
 	    }
 
