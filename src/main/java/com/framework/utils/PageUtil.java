@@ -34,13 +34,6 @@ public class PageUtil {
 	private Actions actions;
 	private JavascriptExecutor js;
 
-	public PageUtil(WebDriver driver, long timeoutSec) {
-		this.driver = driver;
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSec));
-		this.actions = new Actions(driver);
-		this.js = (JavascriptExecutor) driver;
-	}
-
 	public WebDriverWait waitMethod() {
 		return wait;
 	}

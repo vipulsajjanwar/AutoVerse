@@ -10,7 +10,7 @@ import com.framework.report.CustomChainTestReport;
 
 import com.aventstack.chaintest.plugins.ChainTestListener;
 
-@Listeners({ChainTestListener.class, CustomChainTestReport.class})
+@Listeners({ChainTestListener.class})
 public class LoginPageTest extends BaseClass{
 	
 	
@@ -31,7 +31,7 @@ public class LoginPageTest extends BaseClass{
 	    public void sum2() {
 	    	logTestInfo("sum2", "verify addition", "Arthmatic", "ashwind");
 	        ChainTestListener.log("during test 3");
-	        assertEquals(10, Math.addExact(5, 4));
+	       assertEquals(10, Math.addExact(6, 4));
 	        if(true) {
 	        	reportFailLog("Assertion failure", "sum2");
 	        }

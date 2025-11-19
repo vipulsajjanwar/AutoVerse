@@ -35,6 +35,7 @@ com\framework\ai\CodeGenController.class
 com\framework\utils\APIUtil.class
 com\automation\webpages\LoginPage.class
 com\framework\constant\DefaultValues.class
+com\automation\icedq\IcedqLoginPage.class
 com\framework\utils\JsonUtil.class
 com\framework\utils\TimeUtil.class
 com\framework\ai\CodeGenWebApp.class

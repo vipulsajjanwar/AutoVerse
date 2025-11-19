@@ -6,10 +6,12 @@ import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
@@ -50,115 +52,115 @@ public class BaseClass {
 
 	@BeforeSuite(alwaysRun = true)
 	@Parameters({
-	        "suiteName",
-	        "testType",
-	        "browser",
-	        "applicationURL",
-	        "userName",
-	        "password",
-	        "moduleName",
-	        "workspaceName"
+		"suiteName",
+		"testType",
+		"browser",
+		"applicationURL",
+		"userName",
+		"password",
+		"moduleName",
+		"workspaceName"
 	})
 	public void beforeSuite(
-	        String suiteName,
-	        String testType,
-	        String browser,
-	        String baseURL,
-	        String userName,
-	        String password,
-	        String moduleName,
-	        String workspaceName
-	) {
+			String suiteName,
+			String testType,
+			String browser,
+			String baseURL,
+			String userName,
+			String password,
+			String moduleName,
+			String workspaceName
+			) {
 
-	    try {
-	        // ---------------------------
-	        // 1. Load Locators
-	        // ---------------------------
-	        PageUtil.beforesuite(DIR_PATH + "/src/main/resources/locators/");
+		try {
+			// ---------------------------
+			// 1. Load Locators
+			// ---------------------------
+			PageUtil.beforesuite(DIR_PATH + "/src/main/resources/locators/");
 
-	        ExecutionVariables.suitename = suiteName;
+			ExecutionVariables.suitename = suiteName;
 
-	        // ---------------------------
-	        // 2. Setup Extent Reporting
-	        // ---------------------------
-	        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-	        String repName = suiteName + "-Suite-" + timeStamp + ".html";
-	        
-	        System.setProperty("chaintest.generator.simple.output-file",
-	        		DIR_PATH + "/reports/" + buildId + "/" +
-	                        suiteName+timeStamp + "/"+repName);
+			// ---------------------------
+			// 2. Setup Extent Reporting
+			// ---------------------------
+			String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+			String repName = suiteName + "-Suite-" + timeStamp + ".html";
 
-	        ExtentSparkReporter spark = new ExtentSparkReporter(
-	        		DIR_PATH + "/reports/" + buildId + "/" +
-	                        suiteName+timeStamp+"/"+ repName);
-	        
-	       
-	        spark.config().setEncoding("utf-8");
-	        spark.config().setTheme(Theme.DARK);
-	       
-	        spark.config().setDocumentTitle("Automation Execution Report");
-	        spark.config().setReportName(suiteName);
-	        spark.config().setTimeStampFormat("EEEE, MMMM dd, yyyy, hh:mm a");
-	        
-	     // Custom JS (optional)
-	        spark.config().setJS("""
-	            document.addEventListener('DOMContentLoaded', () => {
-	                console.log('Custom JS Loaded');
-	            });
-	        """);
+			System.setProperty("chaintest.generator.simple.output-file",
+					DIR_PATH + "/reports/" + buildId + "/" +
+							suiteName+timeStamp + "/"+repName);
 
-	        // Custom CSS (optional)
-	        spark.config().setCSS("""
-	            .badge-primary { background-color: #0097e6 !important; }
-	            .nav-link.active { color: #fff !important; font-weight: bold; }
-	        """);
+			ExtentSparkReporter spark = new ExtentSparkReporter(
+					DIR_PATH + "/reports/" + buildId + "/" +
+							suiteName+timeStamp+"/"+ repName);
 
-	        extent = new ExtentReports();
-	        extent.attachReporter(spark);
-	        
-	       
-	        extent.setSystemInfo("Suite Name", suiteName);
-	        extent.setSystemInfo("OS", System.getProperty("os.name"));
-	        extent.setSystemInfo("User", System.getProperty("user.name"));
-	        extent.setSystemInfo("Java Version", System.getProperty("java.version"));
-	        extent.setSystemInfo("Environment", System.getProperty("env", "QA"));
-	        extent.setSystemInfo("Execution Time", timeStamp);
-	    //    reportLog("Extent Report Initialized for suite: " + suiteName);
 
-	        // ---------------------------
-	        // 3. Launch Browser (if UI)
-	        // ---------------------------
-	        if (testType != null && testType.trim().equalsIgnoreCase("ui")) {
+			spark.config().setEncoding("utf-8");
+			spark.config().setTheme(Theme.DARK);
 
-	            if (driver == null) {
+			spark.config().setDocumentTitle("Automation Execution Report");
+			spark.config().setReportName(suiteName);
+			spark.config().setTimeStampFormat("EEEE, MMMM dd, yyyy, hh:mm a");
 
-	            //    reportLog("🚀 Launching browser: " + browser);
+			// Custom JS (optional)
+			spark.config().setJS("""
+					    document.addEventListener('DOMContentLoaded', () => {
+					        console.log('Custom JS Loaded');
+					    });
+					""");
 
-	                driver = Launcher.launchBrowser(
-	                        driver,
-	                        browser,
-	                        baseURL,
-	                        userName,
-	                        password,
-	                        log,
-	                        false,
-	                        false,
-	                        moduleName,
-	                        workspaceName
-	                );
+			// Custom CSS (optional)
+			spark.config().setCSS("""
+					    .badge-primary { background-color: #0097e6 !important; }
+					    .nav-link.active { color: #fff !important; font-weight: bold; }
+					""");
 
-	     //           reportPassLog("Browser launched successfully.");
-	            } else {
-	     //       	reportFailLog("Browser already initialized → Reusing existing instance.", "beforeSuite");
-	            }
-	        } else {
-	    //        reportLog("Test type is not UI → Skipping browser launch.");
-	        }
+			extent = new ExtentReports();
+			extent.attachReporter(spark);
 
-	    } catch (Exception e) {
-	   //     reportErrorLog("Error in @BeforeSuite : " + e.getMessage());
-	        e.printStackTrace();
-	    }
+
+			extent.setSystemInfo("Suite Name", suiteName);
+			extent.setSystemInfo("OS", System.getProperty("os.name"));
+			extent.setSystemInfo("User", System.getProperty("user.name"));
+			extent.setSystemInfo("Java Version", System.getProperty("java.version"));
+			extent.setSystemInfo("Environment", System.getProperty("env", "QA"));
+			extent.setSystemInfo("Execution Time", timeStamp);
+			//    reportLog("Extent Report Initialized for suite: " + suiteName);
+
+			// ---------------------------
+			// 3. Launch Browser (if UI)
+			// ---------------------------
+			if (testType != null && testType.trim().equalsIgnoreCase("ui")) {
+
+				if (driver == null) {
+
+					//    reportLog("🚀 Launching browser: " + browser);
+
+					driver = Launcher.launchBrowser(
+							driver,
+							browser,
+							baseURL,
+							userName,
+							password,
+							log,
+							false,
+							false,
+							moduleName,
+							workspaceName
+							);
+
+					//           reportPassLog("Browser launched successfully.");
+				} else {
+					//       	reportFailLog("Browser already initialized → Reusing existing instance.", "beforeSuite");
+				}
+			} else {
+				//        reportLog("Test type is not UI → Skipping browser launch.");
+			}
+
+		} catch (Exception e) {
+			//     reportErrorLog("Error in @BeforeSuite : " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	public static void handleExceptions(Exception e) {
@@ -180,46 +182,46 @@ public class BaseClass {
 		// Start report test
 		ReportUtil.startTest(method.getName(), "Automated test execution");
 
-		
+
 	}
 
 	@AfterSuite(alwaysRun = true)
 	public void tearDown() {
 
-	    try {
-	        reportLog("🧹 Starting suite cleanup...");
-	    } catch (Exception ignore) { }
+		try {
+			reportLog("🧹 Starting suite cleanup...");
+		} catch (Exception ignore) { }
 
-	    // -----------------------------
-	    // 1. Flush Extent Report safely
-	    // -----------------------------
-	    try {
-	        if (extent != null) {
-	            reportLog("Flushing Extent Report...");
-	            extent.flush();
-	        } else {
-	            reportLog("Extent was null → Nothing to flush.");
-	        }
-	    } catch (Exception e) {
-	        System.out.println("Failed to flush Extent Report: " + e.getMessage());
-	    }
+		// -----------------------------
+		// 1. Flush Extent Report safely
+		// -----------------------------
+		try {
+			if (extent != null) {
+				reportLog("Flushing Extent Report...");
+				extent.flush();
+			} else {
+				reportLog("Extent was null → Nothing to flush.");
+			}
+		} catch (Exception e) {
+			System.out.println("Failed to flush Extent Report: " + e.getMessage());
+		}
 
-	    // -----------------------------
-	    // 2. Close Browser safely
-	    // -----------------------------
-	    try {
-	        if (driver != null) {
-	            reportLog("Closing browser session...");
-	            driver.quit();
-	            driver = null;
-	        } else {
-	            reportLog("Driver was null → Browser already closed or not launched.");
-	        }
-	    } catch (Exception e) {
-	    	reportLog("Error closing browser: " + e.getMessage());
-	    }
+		// -----------------------------
+		// 2. Close Browser safely
+		// -----------------------------
+		try {
+			if (driver != null) {
+				reportLog("Closing browser session...");
+				driver.quit();
+				driver = null;
+			} else {
+				reportLog("Driver was null → Browser already closed or not launched.");
+			}
+		} catch (Exception e) {
+			reportLog("Error closing browser: " + e.getMessage());
+		}
 
-	    reportLog("✅ Suite cleanup complete.");
+		reportLog(" Suite cleanup complete.");
 	}
 
 
@@ -248,10 +250,10 @@ public class BaseClass {
 	public void afterMethod() {
 		ChainTestListener.log("ending test");
 	}
-	
+
 	public static void reportPassLog(String message) {
 		test.log(Status.PASS, MarkupHelper.createLabel(message, ExtentColor.GREEN));
-		
+
 		try {
 			String screenshotPath = takeScreenshotForValidationFailure("reportPassLog", driver);
 			test.log(Status.PASS, message + " :::::::: " + "reportPassLog",
@@ -261,79 +263,137 @@ public class BaseClass {
 			Reporter.log("Error observed while captruing screesnhot in reportPassLog method" + e.getMessage());
 		}
 		Reporter.log(message);
+		
 		ChainTestListener.log(message);
 	}
-		
-	public static String takeScreenshotForValidationFailure(String methodName, WebDriver driver) throws IOException {
-		String timeStampformail = new SimpleDateFormat("HH.mm.ss-MM-dd-yyyy").format(new Date());
-		TakesScreenshot ts = (TakesScreenshot) driver;
-		String dest = ts.getScreenshotAs(OutputType.BASE64);
-		File source = ts.getScreenshotAs(OutputType.FILE);
-		File target = new File(Paths.get("").toAbsolutePath().toString() + "/reports/"+buildId+"/Screenshots/" + methodName + File.separator
-				+ methodName + "-"+timeStampformail + ".png");
-		FileUtils.copyFile(source, target);
-		return dest;
 
+	public static String takeScreenshotForValidationFailure(String methodName, WebDriver driver) throws IOException {
+
+		String timestamp = new SimpleDateFormat("HH.mm.ss-MM-dd-yyyy").format(new Date());
+		TakesScreenshot ts = (TakesScreenshot) driver;
+
+		// Capture Base64 (for report)
+		String base64 = ts.getScreenshotAs(OutputType.BASE64);
+
+		// Capture file (for saving)
+		File sourceFile = ts.getScreenshotAs(OutputType.FILE);
+
+		// Create folder path
+		String screenshotDir = Paths.get("").toAbsolutePath().toString()
+				+ "/reports/" + buildId + "/Screenshots/" + methodName;
+
+		File folder = new File(screenshotDir);
+		if (!folder.exists()) {
+			folder.mkdirs();
+		}
+
+		// Save file
+		File destination = new File(folder, methodName + "-" + timestamp + ".png");
+		FileUtils.copyFile(sourceFile, destination);
+
+		return base64;
 	}
-	
+
+	public static String takeScreenshotForChainTestListener(String methodName, WebDriver driver) throws IOException {
+
+
+		String base64=null;
+
+		String timestamp = new SimpleDateFormat("HH.mm.ss-MM-dd-yyyy").format(new Date());
+		TakesScreenshot ts = (TakesScreenshot) driver;
+
+		base64 = ts.getScreenshotAs(OutputType.BASE64);
+
+		// Capture file (for saving)
+		File sourceFile = ts.getScreenshotAs(OutputType.FILE);
+
+		// Create folder path
+		String screenshotDir = Paths.get("").toAbsolutePath().toString()
+				+ "/reports/" + buildId + "/Screenshots/" + methodName;
+
+		File folder = new File(screenshotDir);
+		if (!folder.exists()) {
+			folder.mkdirs();
+		}
+
+		// Save file
+		File destination = new File(folder, methodName + "-" + timestamp + ".png");
+		FileUtils.copyFile(sourceFile, destination);
+
+		ChainTestListener.embed(destination, methodName + "-" + timestamp + ".png");
+
+
+		return base64;
+	}
+
 	public static void reportErrorLog(String message) {
 
 		test.log(Status.ERROR, MarkupHelper.createLabel(message, ExtentColor.GREY));
-		
+
 		try {
 
 			String screenshotPath = takeScreenshotForValidationFailure("reportErrorLog", driver);
 
 			test.log(Status.FAIL, message + "::::::::" + "reportErrorLog",
 					MediaEntityBuilder.createScreenCaptureFromBase64String(screenshotPath).build());
-			
+
 		} catch (IOException e) {
 			Reporter.log("Error observed while captruing screesnhot in reportErrorLog method" + e.getMessage());
 		}
 		Reporter.log(message);
 		ChainTestListener.log(message);
 	}
-	
+
 	public static void reportFailLog(String message, String methodname) {
 
 		test.log(Status.FAIL, MarkupHelper.createLabel(message, ExtentColor.RED));
-		
+		String screenshotPath =null;
 		try {
-			String screenshotPath = takeScreenshotForValidationFailure(methodname, driver);
+			screenshotPath = takeScreenshotForValidationFailure(methodname, driver);
 
 			test.log(Status.FAIL, message + "::::::::" + methodname,
 					MediaEntityBuilder.createScreenCaptureFromBase64String(screenshotPath).build());
-			
+
 		} catch (IOException e) {
 			Reporter.log("Error observed while captruing screesnhot in reportFailLog method" + e.getMessage());
 		}
 		Reporter.log(message);
 		ChainTestListener.log(message);
+		try {
+			takeScreenshotForChainTestListener(methodname, driver);
+		} catch (IOException e) {
+			Reporter.log("Error observed while captruing screesnhot in reportFailLog method" + e.getMessage());
+		}
+
 	}
-	
+
+	public static String getValidFileName(String methodname) {
+		return methodname.replaceAll("[^a-zA-Z0-9_-]", "_") + ".png";
+	}
+
 	public static void skipReportLog(String message) {
 
 		test.log(Status.SKIP, MarkupHelper.createLabel(message, ExtentColor.BLUE));
 		Reporter.log(message);
 		ChainTestListener.log(message);
-		
+
 	}
 	public static void reportTableLog(String [][]message) {
 
 		test.log(Status.INFO, MarkupHelper.createTable(message));
 
 		Reporter.log(Arrays.deepToString(message));
-		
+
 	}
 	public static void reportCodeLog(String code) {
 
 		test.log(Status.INFO, MarkupHelper.createCodeBlock(code));
 
 		Reporter.log(code);
-		
+
 		ChainTestListener.log(code);
 	}
-	
+
 	public static void logTestInfo(String testcaseId, String testcaseName, String testCatagory, String authorName) {
 
 		test = extent.createTest(testcaseName+"-"+testcaseId);
@@ -344,7 +404,7 @@ public class BaseClass {
 		test.assignAuthor(authorName);
 		ExecutionVariables.author = authorName;
 		ExecutionVariables.testName = testcaseName;
-	
+
 	}
-	
+
 }
