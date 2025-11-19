@@ -12,6 +12,7 @@ com\framework\utils\BaseUtil.class
 com\framwork\pojo\AuthConfig.class
 com\framework\report\CustomChainTestReport.class
 com\framework\report\WebEventListener.class
+com\framework\report\ChainTestListener.class
 com\framwork\pojo\Responce.class
 com\framework\ai\WebServer.class
 com\framework\config\ReadConfig.class
@@ -46,6 +47,8 @@ com\framework\base\BaseClass.class
 com\framework\restassured\RestAPI.class
 com\framework\ai\CodeGenService.class
 com\framework\integration\XrayIntegration.class
+com\framework\report\ExtentReportListener.class
+com\framework\report\AllureReportListener.class
 com\framwork\pojo\ConnectionProperty.class
 com\framework\variables\ExecutionVariables.class
 com\framework\report\ExtentManager.class

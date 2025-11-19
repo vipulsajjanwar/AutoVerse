@@ -18,6 +18,7 @@ D:\Home\AutoVerse\src\main\java\com\framwork\pojo\AuthConfig.java
 D:\Home\AutoVerse\src\main\java\com\framework\base\Launcher.java
 D:\Home\AutoVerse\src\main\java\com\framework\utils\TimeUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\constant\DefaultValues.java
+D:\Home\AutoVerse\src\main\java\com\framework\report\AllureReportListener.java
 D:\Home\AutoVerse\src\main\java\com\framework\report\CustomChainTestReport.java
 D:\Home\AutoVerse\src\main\java\com\framework\utils\PageUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\enums\Report.java
@@ -46,5 +47,7 @@ D:\Home\AutoVerse\src\main\java\com\framework\utils\DBUtil.java
 D:\Home\AutoVerse\src\main\java\com\automation\icedq\IcedqLoginPage.java
 D:\Home\AutoVerse\src\main\java\com\framework\base\BaseClass.java
 D:\Home\AutoVerse\src\main\java\com\framework\integration\JiraIntegration.java
+D:\Home\AutoVerse\src\main\java\com\framework\report\ExtentReportListener.java
 D:\Home\AutoVerse\src\main\java\com\framework\report\WebEventListener.java
+D:\Home\AutoVerse\src\main\java\com\framework\report\ChainTestListener.java
 D:\Home\AutoVerse\src\main\java\com\framwork\pojo\RequestPayLoads.java

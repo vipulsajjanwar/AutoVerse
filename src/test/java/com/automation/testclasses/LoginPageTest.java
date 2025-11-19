@@ -6,11 +6,9 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.framework.base.BaseClass;
-import com.framework.report.CustomChainTestReport;
-
 import com.aventstack.chaintest.plugins.ChainTestListener;
 
-@Listeners({ChainTestListener.class})
+//@Listeners({ChainTestListener.class})
 public class LoginPageTest extends BaseClass{
 	
 	
