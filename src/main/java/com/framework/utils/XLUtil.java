@@ -19,8 +19,8 @@ import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Cell;
@@ -44,7 +44,7 @@ public class XLUtil {
 	static XSSFSheet ws;
 	static XSSFRow row;
 	static XSSFCell cell;
-	final static Logger log = LoggerFactory.getLogger(XLUtil.class);
+	public static final Logger log = LogManager.getLogger(XLUtil.class);
 
 	public static void setExcelWBook(InputStream excelFile) {
 		try {
@@ -286,7 +286,7 @@ public class XLUtil {
 
 		String timeStamp = new SimpleDateFormat("HH_mm_ss_MM_dd_yyyy").format(new Date());
 
-		File fileName = new File(excelPath + "_" + xfileName+ "_" + timeStamp + fileExtention);
+		File fileName = new File(excelPath + "/" + xfileName+ "_" + timeStamp + fileExtention);
 
 		try (FileOutputStream fos = new FileOutputStream(fileName); XSSFWorkbook workbook = new XSSFWorkbook()) {
 

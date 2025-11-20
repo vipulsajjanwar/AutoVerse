@@ -1,8 +1,0 @@
-===== Test Suite Started: Login functionality testing =====
-
-Test Started: sum1
-PASSED: sum1
-Test Started: sum2
-PASSED: sum2
-
-===== Suite Finished: Login functionality testing =====

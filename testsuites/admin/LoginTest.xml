@@ -3,9 +3,7 @@
 
 <suite name="Login_Test_Suite" parallel="tests" thread-count="1">
 
-<listeners>
-    <listener class-name="com.framework.report.ChainTestListener" />
-</listeners>
+
 
 	<parameter name="testType" value="ui" />
 	<parameter name="browser" value="chrome" />

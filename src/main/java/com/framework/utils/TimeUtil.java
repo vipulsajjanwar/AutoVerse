@@ -24,10 +24,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
+
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cronutils.model.Cron;
 import com.cronutils.model.CronType;
@@ -44,7 +45,7 @@ public class TimeUtil {
 		throw new UnsupportedOperationException("Utility class cannot be instantiated");
 	}
 
-	static final Logger log = LoggerFactory.getLogger(TimeUtil.class);
+	public static final Logger log = LogManager.getLogger(TimeUtil.class);
 
 	private static DateTimeFormatter getFlexibleDateFormatter(String customFormat) {
 		try {

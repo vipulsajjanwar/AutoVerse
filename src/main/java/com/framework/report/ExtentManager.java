@@ -5,7 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+import com.framework.base.BaseClass;
 import com.framework.variables.ExecutionVariables;
 
 public class ExtentManager {
@@ -21,19 +24,62 @@ public class ExtentManager {
 
     public static ExtentReports createInstance() {
 
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String reportPath = System.getProperty("user.dir") + "/reports/ExtentReport_" + timestamp + ".html";
+    	String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+		String repName = ExecutionVariables.suitename + "-Suite-" + timeStamp + ".html";
 
-        ExtentSparkReporter spark = new ExtentSparkReporter(reportPath);
-        spark.config().setReportName(ExecutionVariables.reportName);
-        spark.config().setDocumentTitle(ExecutionVariables.documentTitle);
+		System.setProperty("chaintest.generator.simple.output-file",
+				BaseClass.DIR_PATH + "/reports/" + BaseClass.buildId + "/" +
+						ExecutionVariables.suitename+timeStamp + "/"+repName);
 
-        extent = new ExtentReports();
-        extent.attachReporter(spark);
+		ExtentSparkReporter spark = new ExtentSparkReporter(
+				BaseClass.DIR_PATH + "/reports/" + BaseClass.buildId + "/" +
+						ExecutionVariables.suitename+timeStamp+"/"+ repName);
 
-        extent.setSystemInfo("Framework", "Selenium + TestNG");
-        extent.setSystemInfo("Author", "SRK Automation");
+
+		spark.config().setEncoding("utf-8");
+		spark.config().setTheme(Theme.DARK);
+
+		spark.config().setDocumentTitle("Automation Execution Report");
+		spark.config().setReportName(ExecutionVariables.suitename);
+		spark.config().setTimeStampFormat("EEEE, MMMM dd, yyyy, hh:mm a");
+
+		// Custom JS (optional)
+		spark.config().setJS("""
+				    document.addEventListener('DOMContentLoaded', () => {
+				        console.log('Custom JS Loaded');
+				    });
+				""");
+
+		// Custom CSS (optional)
+		spark.config().setCSS("""
+				    .badge-primary { background-color: #0097e6 !important; }
+				    .nav-link.active { color: #fff !important; font-weight: bold; }
+				""");
+
+		extent = new ExtentReports();
+		extent.attachReporter(spark);
+
+		extent.setSystemInfo("Suite Name", ExecutionVariables.suitename);
+		extent.setSystemInfo("OS", System.getProperty("os.name"));
+		extent.setSystemInfo("User", System.getProperty("user.name"));
+		extent.setSystemInfo("Java Version", System.getProperty("java.version"));
+		extent.setSystemInfo("Environment", System.getProperty("env", "QA"));
+		extent.setSystemInfo("Execution Time", timeStamp);
 
         return extent;
+    }
+    
+    private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
+
+    public static ExtentTest getTest() {
+        return test.get();
+    }
+
+    public static void setTest(ExtentTest extentTest) {
+        test.set(extentTest);
+    }
+
+    public static void unload() {
+        test.remove();
     }
 }

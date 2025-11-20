@@ -1,21 +1,26 @@
 package com.framework.report;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.support.events.WebDriverListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class WebEventListener implements WebDriverListener {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.events.WebDriverListener;
 
-    private static final Logger log = LoggerFactory.getLogger(WebEventListener.class);
+
+public class WebEventListener implements WebDriverListener  {
+	
+
+	public static final Logger log = LogManager.getLogger(WebEventListener.class);
 
     private String describeElement(WebElement element) {
         try {
@@ -24,127 +29,136 @@ public class WebEventListener implements WebDriverListener {
             return "stale element";
         }
     }
+    
+    private String cleanKeys(CharSequence... keys) {
+        if (keys == null || keys.length == 0) return "";
+        return Arrays.stream(keys)
+                     .map(CharSequence::toString)
+                     .reduce("", String::concat);
+    }
+    
+    private String getCleanLocator(WebElement element) {
+        try {
+            return element.toString()
+                    .replaceAll(".*->", "")
+                    .replace("]", "")
+                    .trim();
+        } catch (Exception e) {
+            return "Unknown Element";
+        }
+    }
 
     // Navigation
     @Override
     public void beforeGet(WebDriver driver, String url) {
-        log.info("Navigating to URL: {}", url);
+        log.info("Navigating to URL:: {}", url);
+        
     }
 
     @Override
     public void afterGet(WebDriver driver, String url) {
-        log.info("Navigated to URL: {}", url);
-    }
-
-    public void beforeNavigateBack(WebDriver.Navigation navigation) {
-        log.info("Navigating back");
-    }
-
-
-    public void afterNavigateBack(WebDriver.Navigation navigation) {
-        log.info("Navigated back");
-    }
-
-  
-    public void beforeNavigateForward(WebDriver.Navigation navigation) {
-        log.info("Navigating forward");
-    }
-
- 
-    public void afterNavigateForward(WebDriver.Navigation navigation) {
-        log.info("Navigated forward");
+        log.info("Navigated to URL:: {}", url);
+       
     }
 
     @Override
     public void beforeRefresh(WebDriver.Navigation navigation) {
         log.info("Refreshing the page");
+     
     }
 
     @Override
     public void afterRefresh(WebDriver.Navigation navigation) {
         log.info("Page refreshed");
+       
     }
 
     // Click / Input / Interaction
     @Override
     public void beforeClick(WebElement element) {
-        log.info("Clicking on element: {}", describeElement(element));
+        log.info("Clicking on element :: {}", getCleanLocator(element));
+       
     }
 
     @Override
     public void afterClick(WebElement element) {
-        log.info("Clicked on element: {}", describeElement(element));
+        log.info("Clicked on element :: {}", getCleanLocator(element));
+       
     }
 
     @Override
     public void beforeSendKeys(WebElement element, CharSequence... keysToSend) {
-        log.info("Typing '{}' into element: {}", String.valueOf(keysToSend), describeElement(element));
+        log.info("Typing '{}' into element :: {}", cleanKeys(keysToSend), getCleanLocator(element));
+       
     }
 
     @Override
     public void afterSendKeys(WebElement element, CharSequence... keysToSend) {
-        log.info("Typed '{}' into element: {}", String.valueOf(keysToSend), describeElement(element));
+        log.info("Typed '{}' into element :: {}", cleanKeys(keysToSend), getCleanLocator(element));
+       
     }
 
     @Override
     public void beforeClear(WebElement element) {
-        log.info("Clearing element: {}", describeElement(element));
+        log.info("Clearing element :: {}", getCleanLocator(element));
+        
     }
 
     @Override
     public void afterClear(WebElement element) {
-        log.info("Cleared element: {}", describeElement(element));
+        log.info("Cleared element :: {}", getCleanLocator(element));
+        
     }
 
     @Override
     public void beforeSubmit(WebElement element) {
-        log.info("Submitting form using element: {}", describeElement(element));
+        log.info("Submitting form using element :: {}", getCleanLocator(element));
     }
 
     @Override
     public void afterSubmit(WebElement element) {
-        log.info("Form submitted using element: {}", describeElement(element));
+        log.info("Form submitted using element :: {}", getCleanLocator(element));
     }
 
     // Finding elements
     @Override
     public void beforeFindElement(WebDriver driver, By locator) {
-        log.info("Finding element by: {}", locator);
+        log.info("Finding element :: {}", locator);
     }
 
     @Override
     public void afterFindElement(WebDriver driver, By locator, WebElement result) {
-        log.info("Found element by: {}", locator);
+        log.info("Found element :: {}", locator);
     }
 
     @Override
     public void beforeFindElements(WebDriver driver, By locator) {
-        log.info("Finding elements by: {}", locator);
+     //   log.info("Finding elements by:: {}", locator);
     }
 
     @Override
     public void afterFindElements(WebDriver driver, By locator, List<WebElement> result) {
-        log.info("Found {} elements by: {}", result.size(), locator);
+        log.info("Found {} elements :: {}", result.size(), locator);
     }
 
     @Override
     public void beforeFindElement(WebElement element, By locator) {
-        log.info("Finding child element by: {} from {}", locator, describeElement(element));
+        log.info("Finding child element :: {} from {}", locator, getCleanLocator(element));
     }
 
     @Override
     public void afterFindElement(WebElement element, By locator, WebElement result) {
-        log.info("Found child element by: {} from {}", locator, describeElement(element));
+        log.info("Found child element :: {} from {}", locator, getCleanLocator(element));
     }
 
     @Override
     public void beforeFindElements(WebElement element, By locator) {
-        log.info("Finding child elements by: {} from {}", locator, describeElement(element));
+        log.info("Finding child elements :: {} from {}", locator, describeElement(element));
     }
 
     @Override
     public void afterFindElements(WebElement element, By locator, List<WebElement> result) {
-        log.info("Found {} child elements by: {} from {}", result.size(), locator, describeElement(element));
+        log.info("Found {} child elements :: {} from {}", result.size(), locator, getCleanLocator(element));
     }
 
     // Alerts
@@ -178,108 +192,35 @@ public class WebEventListener implements WebDriverListener {
         log.info("Sent keys '{}' to alert", keysToSend);
     }
 
-    // Screenshot
-  
-    public <T> void beforeGetScreenshotAs(OutputType<T> outputType) {
-        log.info("Taking screenshot: {}", outputType.toString());
-    }
-
-
-    public <T> void afterGetScreenshotAs(OutputType<T> outputType, T screenshot) {
-        log.info("Screenshot taken: {}", outputType.toString());
-    }
-
-    // Script execution
- 
-    public void beforeExecuteScript(JavascriptExecutor js, String script, Object[] args) {
-        log.info("Executing script: {}", script);
-    }
-
-
-    public void afterExecuteScript(JavascriptExecutor js, String script, Object[] args, Object result) {
-        log.info("Script executed: {}", script);
-    }
-
-    // Switching
- 
-    public void beforeSwitchToWindow(WebDriver driver, String nameOrHandle) {
-        log.info("Switching to window: {}", nameOrHandle);
-    }
-
-
-    public void afterSwitchToWindow(WebDriver driver, String nameOrHandle) {
-        log.info("Switched to window: {}", nameOrHandle);
-    }
-
-
-    public void beforeSwitchToFrame(WebDriver driver, int index) {
-        log.info("Switching to frame by index: {}", index);
-    }
-
-  
-    public void afterSwitchToFrame(WebDriver driver, int index) {
-        log.info("Switched to frame by index: {}", index);
-    }
-
-
-    public void beforeSwitchToFrame(WebDriver driver, String nameOrId) {
-        log.info("Switching to frame by name/id: {}", nameOrId);
-    }
-
-    
-    public void afterSwitchToFrame(WebDriver driver, String nameOrId) {
-        log.info("Switched to frame by name/id: {}", nameOrId);
-    }
-
-
-    public void beforeSwitchToFrame(WebDriver driver, WebElement frameElement) {
-        log.info("Switching to frame element: {}", describeElement(frameElement));
-    }
-
-
-    public void afterSwitchToFrame(WebDriver driver, WebElement frameElement) {
-        log.info("Switched to frame element: {}", describeElement(frameElement));
-    }
-
- 
-    public void beforeSwitchToDefaultContent(WebDriver driver) {
-        log.info("Switching to default content");
-    }
-
- 
-    public void afterSwitchToDefaultContent(WebDriver driver) {
-        log.info("Switched to default content");
-    }
-
     // Cookies
     @Override
     public void beforeAddCookie(WebDriver.Options options, Cookie cookie) {
-        log.info("Adding cookie: {}", cookie);
+        log.info("Adding cookie:: {}", cookie);
     }
 
     @Override
     public void afterAddCookie(WebDriver.Options options, Cookie cookie) {
-        log.info("Added cookie: {}", cookie);
+        log.info("Added cookie:: {}", cookie);
     }
 
     @Override
     public void beforeDeleteCookieNamed(WebDriver.Options options, String name) {
-        log.info("Deleting cookie by name: {}", name);
+        log.info("Deleting cookie by name:: {}", name);
     }
 
     @Override
     public void afterDeleteCookieNamed(WebDriver.Options options, String name) {
-        log.info("Deleted cookie by name: {}", name);
+        log.info("Deleted cookie by name:: {}", name);
     }
 
     @Override
     public void beforeDeleteCookie(WebDriver.Options options, Cookie cookie) {
-        log.info("Deleting cookie: {}", cookie);
+        log.info("Deleting cookie:: {}", cookie);
     }
 
     @Override
     public void afterDeleteCookie(WebDriver.Options options, Cookie cookie) {
-        log.info("Deleted cookie: {}", cookie);
+        log.info("Deleted cookie:: {}", cookie);
     }
 
     @Override
@@ -304,12 +245,12 @@ public class WebEventListener implements WebDriverListener {
 
     @Override
     public void beforeGetCookieNamed(WebDriver.Options options, String name) {
-        log.info("Getting cookie by name: {}", name);
+        log.info("Getting cookie by name:: {}", name);
     }
 
     @Override
     public void afterGetCookieNamed(WebDriver.Options options, String name, Cookie cookie) {
-        log.info("Retrieved cookie: {}", cookie);
+        log.info("Retrieved cookie:: {}", cookie);
     }
 
     // Title, URL, Window Handle
@@ -320,7 +261,7 @@ public class WebEventListener implements WebDriverListener {
 
     @Override
     public void afterGetTitle(WebDriver driver, String result) {
-        log.info("Page title is: {}", result);
+        log.info("Page title is:: {}", result);
     }
 
     @Override
@@ -330,7 +271,7 @@ public class WebEventListener implements WebDriverListener {
 
     @Override
     public void afterGetCurrentUrl(WebDriver driver, String result) {
-        log.info("Current URL is: {}", result);
+        log.info("Current URL is:: {}", result);
     }
 
     @Override
@@ -340,12 +281,13 @@ public class WebEventListener implements WebDriverListener {
 
     @Override
     public void afterGetWindowHandle(WebDriver driver, String result) {
-        log.info("Current window handle is: {}", result);
+        log.info("Current window handle is:: {}", result);
     }
 
     // Error Handling
     @Override
     public void onError(Object target, Method method, Object[] args, InvocationTargetException e) {
-        log.error("Exception in method '{}': {}", method.getName(), e.getTargetException().getMessage(), e);
+        log.error("Exception in method '{}':: {}", method.getName(), e.getTargetException().getMessage(), e);
     }
+    
 }

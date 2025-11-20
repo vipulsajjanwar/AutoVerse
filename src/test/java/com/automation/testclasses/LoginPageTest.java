@@ -6,9 +6,10 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.framework.base.BaseClass;
+import com.framework.report.ExtentReportListener;
 import com.aventstack.chaintest.plugins.ChainTestListener;
 
-//@Listeners({ChainTestListener.class})
+@Listeners(ExtentReportListener.class)
 public class LoginPageTest extends BaseClass{
 	
 	
@@ -19,7 +20,7 @@ public class LoginPageTest extends BaseClass{
 	    	logTestInfo("sum1", "verify addition", "Arthmatic", "vipuls");
 	    	
 	        ChainTestListener.log("during test 1");
-	       assertEquals(10, Math.addExact(6, 4));
+	       assertEquals(Math.addExact(6, 4), 10);
 	       
 	        ChainTestListener.log("during test 2");
 	        
@@ -29,7 +30,7 @@ public class LoginPageTest extends BaseClass{
 	    public void sum2() {
 	    	logTestInfo("sum2", "verify addition", "Arthmatic", "ashwind");
 	        ChainTestListener.log("during test 3");
-	       assertEquals(10, Math.addExact(6, 4));
+	       assertEquals(Math.addExact(6, 4), 10);
 	        if(true) {
 	        	reportFailLog("Assertion failure", "sum2");
 	        }

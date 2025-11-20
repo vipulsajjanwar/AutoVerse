@@ -1,49 +1,68 @@
 package com.framework.report;
 
+
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.framework.base.BaseClass;
+import com.framework.utils.XLUtil;
+import com.framework.variables.ExecutionVariables;
+
 
 public class ExtentReportListener implements ITestListener {
 
-    private static ExtentReports extent;
-    private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
+	public static final Logger log = LogManager.getLogger(ExtentReportListener.class);
+	
+	XLUtil xlReader = new XLUtil();
 
-    @Override
-    public void onStart(ITestContext context) {
-        ExtentSparkReporter spark = new ExtentSparkReporter("reports/ExtentReport.html");
-        extent = new ExtentReports();
-        extent.attachReporter(spark);
-    }
+	boolean testSuccess = true;
 
-    @Override
-    public void onTestStart(ITestResult result) {
-        ExtentTest extentTest = extent.createTest(result.getMethod().getMethodName());
-        test.set(extentTest);
-    }
+	public static String ReportDocument =null;
 
-    @Override
-    public void onTestSuccess(ITestResult result) {
-        test.get().pass("Test Passed");
-    }
+	String tstartTime;
+	String tendTime;
+	String timeformat="M/d/yyyy, h:mm:ss a";
+	String timezone="Asia/Calcutta";
 
-    @Override
-    public void onTestFailure(ITestResult result) {
-        test.get().fail(result.getThrowable());
-    }
+	@Override
+	public void onStart(ITestContext context) {
 
-    @Override
-    public void onTestSkipped(ITestResult result) {
-        test.get().skip("Test Skipped");
-    }
+		ExecutionVariables.reportDocPath = XLUtil.createWorkBook(BaseClass.DIR_PATH+"/src/main/resources/reportdoc", ExecutionVariables.suitename, ".xlsx");
+		ReportDocument = ExecutionVariables.reportDocPath;
+		log.info("","Exection status report doc path :: "+ReportDocument);
+	}
 
-    @Override
-    public void onFinish(ITestContext context) {
-        extent.flush();
-    }
+	@Override
+	public void onTestStart(ITestResult result) {
+		 
+		
+	}
+
+	@Override
+	public void onTestSuccess(ITestResult result) {
+		 ExtentManager.getTest().pass("Test Passed");
+		log.info("The name of the testcase passed is :"+result.getName());	
+	}
+
+	@Override
+	public void onTestFailure(ITestResult result) {
+		 ExtentManager.getTest().fail(result.getThrowable());
+		log.info("The name of the testcase failed is :"+result.getName());	
+	}
+
+	@Override
+	public void onTestSkipped(ITestResult result) {
+		 ExtentManager.getTest().skip("Test Skipped");
+		log.info("The name of the testcase skipped is :"+result.getName());	
+	}
+
+	@Override
+	public void onFinish(ITestContext context) {
+		
+	}
 
 }

@@ -2,7 +2,6 @@ com\automation\webpages\HomePage.class
 com\framework\enums\Tests.class
 com\framework\utils\XLUtil.class
 com\framework\ai\AIScriptGenerator$1.class
-com\framework\report\GenerateReport.class
 com\framework\enums\Pages.class
 com\framework\ai\CodeGenerator.class
 com\framework\constant\SqlQueries.class
@@ -10,9 +9,7 @@ com\framework\constant\ApiConstants.class
 com\framework\integration\EmailIntegration.class
 com\framework\utils\BaseUtil.class
 com\framwork\pojo\AuthConfig.class
-com\framework\report\CustomChainTestReport.class
 com\framework\report\WebEventListener.class
-com\framework\report\ChainTestListener.class
 com\framwork\pojo\Responce.class
 com\framework\ai\WebServer.class
 com\framework\config\ReadConfig.class
@@ -27,7 +24,6 @@ com\framwork\pojo\RequestPayLoads.class
 com\framework\base\Launcher.class
 com\framwork\pojo\Root.class
 com\framework\enums\Report.class
-com\framework\report\TestListener.class
 com\framwork\pojo\Info.class
 com\framework\ai\AIScriptGenerator.class
 com\framework\constant\JsonPathConstants.class
@@ -42,13 +38,13 @@ com\framework\utils\TimeUtil.class
 com\framework\ai\CodeGenWebApp.class
 com\framework\constant\LogMessages.class
 com\framework\constant\Constant.class
+com\automation\icedq\IcedqHomePage.class
 com\framework\utils\ELKUtil.class
 com\framework\base\BaseClass.class
 com\framework\restassured\RestAPI.class
 com\framework\ai\CodeGenService.class
 com\framework\integration\XrayIntegration.class
 com\framework\report\ExtentReportListener.class
-com\framework\report\AllureReportListener.class
 com\framwork\pojo\ConnectionProperty.class
 com\framework\variables\ExecutionVariables.class
 com\framework\report\ExtentManager.class

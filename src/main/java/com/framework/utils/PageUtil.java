@@ -5,11 +5,16 @@ import java.io.FileInputStream;
 import java.time.Duration;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.framework.base.BaseClass;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -22,11 +27,9 @@ public class PageUtil {
 
 	protected static final Properties prop = new Properties();
 
-	static final Logger log = LoggerFactory.getLogger(PageUtil.class);
+	public static final Logger log = LogManager.getLogger(PageUtil.class);
 
 	public static final String DIR_PATH=System.getProperty("user.dir");
-
-	protected WebDriver driver;
 	protected WebDriverWait wait;
 
 	String locatorSeperator = "~~";
@@ -34,22 +37,33 @@ public class PageUtil {
 	private Actions actions;
 	private JavascriptExecutor js;
 
-	public WebDriverWait waitMethod() {
+	public WebDriverWait waitMethod(WebDriver driver, int seconds) {
+		wait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
+		wait.ignoring(NoSuchElementException.class);
+		wait.ignoring(StaleElementReferenceException.class);
+		wait.ignoring(ElementClickInterceptedException.class);
+		// Wait for the page to load completely
+		wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState")
+				.equals("complete"));
+		
 		return wait;
 	}
 
 	public static void beforesuite(String locatorsFolderPath) {
 
-
+		
 		File folder = new File(locatorsFolderPath);
 
 		File[] listOfFiles = folder.listFiles();
 
 		for (int i = 0; i < listOfFiles.length; i++) {
+			
 			if (listOfFiles[i].isFile()) {
 				log.info("File " + listOfFiles[i].getName());
 
 				Properties prop2 = new Properties();
+				
+				locatorsFolderPath=locatorsFolderPath.endsWith("/") ? locatorsFolderPath: locatorsFolderPath+"/" ;
 
 				File src = new File(locatorsFolderPath + listOfFiles[i].getName());
 
@@ -109,237 +123,298 @@ public class PageUtil {
 	}
 
 	public boolean isNotDisplayed(WebDriver driver, By locator, int waitTime) {
-		boolean flag = false;
-		long endTime = 0;
-		try {
-			endTime = System.currentTimeMillis() + (waitTime * 1000);
+	    boolean flag = false;
+	    long endTime = 0;
 
-			while (System.currentTimeMillis() < endTime) {
+	    try {
+	        BaseClass.reportLog("Checking invisibility for locator: " + locator);
 
-				if (!driver.findElement(locator).isDisplayed()) {
-					flag = true;
-					break;
-				}
-			}
+	        endTime = System.currentTimeMillis() + (waitTime * 1000);
 
-			if(System.currentTimeMillis() > endTime && driver.findElement(locator).isDisplayed()) {
-				log.error("Unexpected webelement still visible on page kindly check"+locator);
-			}
+	        while (System.currentTimeMillis() < endTime) {
+	        	 try {
+	                 WebElement ele = driver.findElement(locator);
 
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
+	                 if (!ele.isDisplayed()) {
+	                     BaseClass.reportLog("Element is NOT displayed: " + locator);
+	                     return true;
+	                 }
 
-		return flag;
+	             } catch (NoSuchElementException | StaleElementReferenceException e) {
+	                 // If element is NOT in DOM → it is NOT visible → return TRUE
+	                 BaseClass.reportLog("Element NOT found in DOM → treated as NOT displayed: " + locator);
+	                 return true;
+	             }
+	        }
+
+	        if (System.currentTimeMillis() > endTime && driver.findElement(locator).isDisplayed()) {
+	            String msg = "Unexpected: Element still visible after wait: " + locator;
+	            log.error(msg);
+	            BaseClass.reportFailLog(msg, "isNotDisplayed");
+	        }
+
+	    } catch (Exception e) {
+	        log.error(e.getMessage());
+	        BaseClass.reportErrorLog("Exception in isNotDisplayed(): " + e.getMessage());
+	    }
+
+	    return flag;
 	}
+
 
 	// ---------------------- Wait Helpers ----------------------
 
-	public WebElement waitForVisibility(By locator) {
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+	public WebElement waitForVisibility(WebDriver driver, By locator) {
+	    try {
+	        BaseClass.reportLog("Waiting for visibility: " + locator);
+	        return waitMethod(driver, 3).until(ExpectedConditions.presenceOfElementLocated(locator));
+	    } catch (Exception e) {
+	        BaseClass.reportErrorLog("waitForVisibility failed: " + locator + " | " + e.getMessage());
+	        throw e;
+	    }
 	}
 
-	public WebElement waitForClickable(By locator) {
-		return wait.until(ExpectedConditions.elementToBeClickable(locator));
+
+	public WebElement waitForClickable(WebDriver driver, By locator) {
+	    try {
+	        BaseClass.reportLog("Waiting for clickable: " + locator);
+	        return waitMethod(driver, 3).until(ExpectedConditions.elementToBeClickable(locator));
+	    } catch (Exception e) {
+	        BaseClass.reportErrorLog("waitForClickable failed: " + locator + " | " + e.getMessage());
+	        throw e;
+	    }
 	}
 
-	public boolean waitForInvisibility(By locator) {
-		return wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+
+	public boolean waitForInvisibility(WebDriver driver, By locator) {
+		return waitMethod(driver, 3).until(ExpectedConditions.invisibilityOfElementLocated(locator));
 	}
 
-	public WebElement waitForVisible(By locator) {
-		return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+	private WebElement fallbackWait(WebDriver driver, By locator, int seconds) {
+	    try {
+	        BaseClass.reportLog("Trying fallback wait for locator: " + locator);
+	        WebDriverWait fallbackWait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
+	        return fallbackWait.until(ExpectedConditions.presenceOfElementLocated(locator));
+	    } catch (Exception e) {
+	        String msg = "Fallback wait failed for: " + locator + " | " + e.getMessage();
+	        log.error(msg);
+	        BaseClass.reportErrorLog(msg);
+	        return null;
+	    }
 	}
 
-	// Common fallback wait (extra wait during latency)
-	private WebElement fallbackWait(By locator, int seconds) {
-		try {
-			WebDriverWait fallbackWait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
-			return fallbackWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-		} catch (Exception e) {
-			log.error("Fallback wait failed: " + locator + " | " + e.getMessage());
-			return null;
-		}
-	}
 
 	// ------------------------- isDisplayed() -------------------------
-	public boolean isDisplayed(By locator) {
-		try {
-			WebElement element = waitForVisibility(locator);
-			return element.isDisplayed();
-		} catch (TimeoutException e) {
-			log.warn("Primary wait timeout for: " + locator + " | Trying fallback...");
+	public boolean isDisplayed(WebDriver driver, By locator, String label) {
+	    try {
+	        BaseClass.reportLog("Checking display status: " + locator);
+	        WebElement element = waitForVisibility(driver, locator);
+	        return element.isDisplayed();
+	    } catch (TimeoutException e) {
+	        BaseClass.reportFailLog("Timeout in isDisplayed() for: " + locator, "isDisplayed");
+	        WebElement fallback = fallbackWait(driver, locator, 5);
 
-			WebElement fallback = fallbackWait(locator, 5);
-			if (fallback != null) {
-				try { return fallback.isDisplayed(); } 
-				catch (Exception ex) {
-					log.error("Fallback check failed for isDisplayed(): " + locator);
-				}
-			}
-			return false;
-		} catch (Exception e) {
-			log.error("Unexpected error in isDisplayed(): " + e.getMessage());
-			return false;
-		}
+	        if (fallback != null) {
+	            return fallback.isDisplayed();
+	        }
+	        return false;
+	    } catch (Exception e) {
+	        BaseClass.reportErrorLog("Unexpected error in isDisplayed(): " + e.getMessage());
+	        return false;
+	    }
 	}
+
 
 	// ------------------------- isEnabled() -------------------------
-	public boolean isEnabled(By locator) {
-		try {
-			return waitForVisibility(locator).isEnabled();
-		} catch (Exception e) {
-			log.warn("isEnabled() failed for: " + locator + " | Trying fallback...");
-			WebElement fallback = fallbackWait(locator, 5);
+	public boolean isEnabled(WebDriver driver, By locator, String label) {
+	    try {
+	        BaseClass.reportLog("Checking enabled state: " + locator);
+	        return waitForVisibility(driver, locator).isEnabled();
+	    } catch (Exception e) {
+	        BaseClass.reportFailLog("isEnabled() failed for: " + locator, "isEnabled");
+	        WebElement fallback = fallbackWait(driver, locator, 5);
 
-			if (fallback != null) {
-				return fallback.isEnabled();
-			}
+	        if (fallback != null) {
+	            return fallback.isEnabled();
+	        }
 
-			throw new NoSuchElementException("Failed in isEnabled() for locator: " + locator);
-		}
+	        BaseClass.reportErrorLog("isEnabled -> NoSuchElement: " + locator);
+	        throw new NoSuchElementException("Failed in isEnabled() for locator: " + locator);
+	    }
 	}
+
+
 
 	// ------------------------- isSelected() -------------------------
-	public boolean isSelected(By locator) {
-		try {
-			return waitForClickable(locator).isSelected();
-		} catch (Exception e) {
-			log.warn("isSelected() failed for: " + locator + " | Trying fallback...");
-			WebElement fallback = fallbackWait(locator, 5);
+	public boolean isSelected(WebDriver driver, By locator, String label) {
+	    try {
+	        BaseClass.reportLog("Checking selected state: " + locator);
+	        return waitForClickable(driver, locator).isSelected();
+	    } catch (Exception e) {
+	        BaseClass.reportFailLog("isSelected() failed for: " + locator, "isSelected");
+	        WebElement fallback = fallbackWait(driver, locator, 5);
 
-			if (fallback != null) {
-				return fallback.isSelected();
-			}
+	        if (fallback != null) {
+	            return fallback.isSelected();
+	        }
 
-			throw new NoSuchElementException("Failed in isSelected() for locator: " + locator);
-		}
+	        BaseClass.reportErrorLog("isSelected() -> NoSuchElement: " + locator);
+	        throw new NoSuchElementException("Failed in isSelected() for locator: " + locator);
+	    }
 	}
+
 
 	// ------------------------- click() -------------------------
-	public void click(By locator) {
-		try {
-			waitForClickable(locator).click();
-		} catch (Exception e) {
-			log.warn("Click failed for: " + locator + " | Trying fallback...");
+	public void click(WebDriver driver, By locator, String label) {
+	    try {
+	        BaseClass.reportLog("Clicking on: " + label);
+	        waitForClickable(driver, locator).click();
+	    } catch (Exception e) {
+	        BaseClass.reportFailLog("Click failed for: " + label, "click");
 
-			WebElement fallback = fallbackWait(locator, 5);
-			if (fallback != null) {
-				try {
-					fallback.click();
-					return;
-				} catch (Exception ignored) {}
-			}
+	        WebElement fallback = fallbackWait(driver, locator, 5);
+	        if (fallback != null) {
+	            try {
+	                fallback.click();
+	                return;
+	            } catch (Exception ignored) {}
+	        }
 
-			throw new NoSuchElementException("Failed in click() for locator: " + locator);
-		}
+	        BaseClass.reportErrorLog("Click() final failure for: " + locator);
+	        throw new NoSuchElementException("Failed in click() for locator: " + locator);
+	    }finally {
+	    	
+	    	 isNotDisplayed(driver, getElementLocator(prop.getProperty("icedq.spinner")), 30);
+	    }
 	}
+
 
 	// ------------------------- getText() -------------------------
-	public String getText(By locator) {
-		try {
-			return waitMethod().until(ExpectedConditions.presenceOfElementLocated(locator)).getText();
-		} catch (Exception e) {
-			log.warn("getText() failed for: " + locator + " | Trying fallback...");
+	public String getText(WebDriver driver, By locator, String label) {
+	    try {
+	        BaseClass.reportLog("Getting text for: " + label);
+	        return waitMethod(driver, 3).until(ExpectedConditions.presenceOfElementLocated(locator)).getText();
+	    } catch (Exception e) {
+	        BaseClass.reportFailLog("getText() failed for: " + locator, "getText");
+	        WebElement fallback = fallbackWait(driver, locator, 5);
 
-			WebElement fallback = fallbackWait(locator, 5);
-			if (fallback != null) {
-				return fallback.getText();
-			}
+	        if (fallback != null) {
+	            return fallback.getText();
+	        }
 
-			throw new NoSuchElementException("Failed in getText() for locator: " + locator);
-		}
+	        BaseClass.reportErrorLog("getText() -> Unable to retrieve text: " + locator);
+	        throw new NoSuchElementException("Failed in getText() for locator: " + locator);
+	    }
 	}
+
 
 	// ------------------------- clear() -------------------------
-	public void clear(By locator) {
-		try {
-			waitForClickable(locator).clear();
-		} catch (Exception e) {
-			log.warn("clear() failed for: " + locator + " | Trying fallback...");
+	public void clear(WebDriver driver, By locator, String label) {
+	    try {
+	        BaseClass.reportLog("Clearing field: " + label);
+	        waitForClickable(driver, locator).clear();
+	    } catch (Exception e) {
+	        BaseClass.reportFailLog("clear() failed for: " + locator, "clear");
+	        WebElement fallback = fallbackWait(driver, locator, 5);
 
-			WebElement fallback = fallbackWait(locator, 5);
-			if (fallback != null) {
-				fallback.clear();
-				return;
-			}
+	        if (fallback != null) {
+	            fallback.clear();
+	            return;
+	        }
 
-			throw new NoSuchElementException("Failed in clear() for locator: " + locator);
-		}
+	        BaseClass.reportErrorLog("clear() -> Unable to clear: " + locator);
+	        throw new NoSuchElementException("Failed in clear() for locator: " + locator);
+	    }
 	}
+
 
 	// ------------------------- visible() -------------------------
-	public void visible(By locator) {
-		try {
-			waitForVisibility(locator);
-		} catch (Exception e) {
-			log.warn("visible() failed for: " + locator + " | Trying fallback...");
-			fallbackWait(locator, 5);  // no return required
-		}
+	public void visible(WebDriver driver, By locator) {
+	    try {
+	        BaseClass.reportLog("Validating visibility: " + locator);
+	        waitForVisibility(driver, locator);
+	    } catch (Exception e) {
+	        BaseClass.reportFailLog("visible() failed for: " + locator, "visible");
+	        fallbackWait(driver, locator, 5);
+	    }
 	}
+
 
 	// ------------------------------
 	// CLICK with fallback mechanism
 	// ------------------------------
-	public void clickWithFallback(By locator) {
-		try {
-			WebElement ele = waitForClickable(locator);
-			ele.click(); // PRIMARY CLICK
-		} catch (Exception e1) {
-			try {
-				// FALLBACK 1: Actions Click
-				WebElement ele = waitForVisible(locator);
-				actions.moveToElement(ele).click().perform();
-			} catch (Exception e2) {
-				// FALLBACK 2: JavaScript Click
-				WebElement ele = driver.findElement(locator);
-				js.executeScript("arguments[0].click();", ele);
-			}
-		}
+	public void clickWithFallback(WebDriver driver, By locator) {
+	    try {
+	        BaseClass.reportLog("Primary click attempt: " + locator);
+	        WebElement ele = waitForClickable(driver, locator);
+	        ele.click();
+	    } catch (Exception e1) {
+	        BaseClass.reportFailLog("Primary click failed for: " + locator, "clickWithFallback");
+
+	        try {
+	            BaseClass.reportLog("Fallback ACTIONS click: " + locator);
+	            WebElement ele = waitForVisibility(driver, locator);
+	            actions.moveToElement(ele).click().perform();
+	        } catch (Exception e2) {
+	            BaseClass.reportLog("Fallback JS click: " + locator);
+	            WebElement ele = driver.findElement(locator);
+	            js.executeScript("arguments[0].click();", ele);
+	        }
+	    }
 	}
+
 
 	// ------------------------------
 	// SENDKEYS with fallback
 	// ------------------------------
-	public void sendKeys(By locator, String value) {
-		try {
-			WebElement ele = waitForVisible(locator);
-			ele.clear();
-			ele.sendKeys(value);   // PRIMARY SENDKEYS
-		} catch (Exception e1) {
-			try {
-				// FALLBACK 1: Actions → sendKeys
-				WebElement ele = waitForVisible(locator);
-				actions.moveToElement(ele).click().sendKeys(value).perform();
-			} catch (Exception e2) {
-				// FALLBACK 2: JS set value
-				WebElement ele = driver.findElement(locator);
-				js.executeScript("arguments[0].value='" + value + "';", ele);
-			}
-		}
+	public void sendKeys(WebDriver driver, By locator, String value, String label) {
+	    try {
+	        BaseClass.reportLog("Typing into: " + label + " | Value: " + value);
+	        WebElement ele = waitForVisibility(driver, locator);
+	        ele.clear();
+	        ele.sendKeys(value);
+	    } catch (Exception e1) {
+	        BaseClass.reportFailLog("Primary sendKeys failed for: " + label, "sendKeys");
+
+	        try {
+	            BaseClass.reportLog("Fallback ACTIONS sendKeys: " + locator);
+	            WebElement ele = waitForVisibility(driver, locator);
+	            actions.moveToElement(ele).click().sendKeys(value).perform();
+	        } catch (Exception e2) {
+	            BaseClass.reportLog("Fallback JS sendKeys: " + locator);
+	            WebElement ele = driver.findElement(locator);
+	            js.executeScript("arguments[0].value='" + value + "';", ele);
+	        }
+	    }
 	}
+
 
 	// ------------------------------
 	// GET TEXT with fallback
 	// ------------------------------
-	public String getTextWithFallback(By locator) {
-		try {
-			return waitForVisible(locator).getText();   // PRIMARY TEXT
-		} catch (Exception e1) {
-			try {
-				WebElement ele = driver.findElement(locator);
-				return ele.getDomAttribute("innettext");   // FALLBACK 1
-			} catch (Exception e2) {
-				return js.executeScript("return arguments[0].textContent;",
-						driver.findElement(locator)).toString();  // FALLBACK 2
-			}
-		}
+	public String getTextWithFallback(WebDriver driver, By locator) {
+	    try {
+	        BaseClass.reportLog("Getting text (primary): " + locator);
+	        return waitForVisibility(driver, locator).getText();
+	    } catch (Exception e1) {
+	        BaseClass.reportFailLog("Primary getText failed: " + locator, "getTextWithFallback");
+
+	        try {
+	            BaseClass.reportLog("Fallback DOM attribute text: " + locator);
+	            WebElement ele = driver.findElement(locator);
+	            return ele.getDomAttribute("innertext");
+	        } catch (Exception e2) {
+	            BaseClass.reportLog("Fallback JS textContent: " + locator);
+	            return js.executeScript("return arguments[0].textContent;",
+	                    driver.findElement(locator)).toString();
+	        }
+	    }
 	}
 
 	// ------------------------------
 	// SCROLL methods
 	// ------------------------------
-	public void scrollTo(By locator) {
+	public void scrollTo(WebDriver driver, By locator) {
 		WebElement ele = driver.findElement(locator);
 		js.executeScript("arguments[0].scrollIntoView(true);", ele);
 	}
@@ -351,7 +426,7 @@ public class PageUtil {
 	// ------------------------------
 	// SELECT DROPDOWN by visible text with fallback
 	// ------------------------------
-	public void selectFromDropdown(By locator, String optionText) {
+	public void selectFromDropdown(WebDriver driver, By locator, String optionText) {
 		try {
 			WebElement ele = driver.findElement(locator);
 			ele.click();
@@ -368,7 +443,7 @@ public class PageUtil {
 	// ------------------------------
 	// SAFE CLEAR method
 	// ------------------------------
-	public void clearWithFallback(By locator) {
+	public void clearWithFallback(WebDriver driver, By locator) {
 		try {
 			driver.findElement(locator).clear(); // primary
 		} catch (Exception e) {
@@ -379,11 +454,11 @@ public class PageUtil {
 	// ------------------------------
 	// RETRY CLICK
 	// ------------------------------
-	public void retryClick(By locator, int attempts) {
+	public void retryClick(WebDriver driver, By locator, int attempts, String label) {
 		int count = 0;
 		while (count < attempts) {
 			try {
-				click(locator);
+				click(driver, locator, label);
 				return;
 			} catch (Exception e) {
 				count++;

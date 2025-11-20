@@ -7,18 +7,19 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import com.aventstack.extentreports.Status;
-import com.framework.config.ReadConfig;
-import com.framework.variables.ExecutionVariables;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
+
+import com.framework.report.WebEventListener;
+
+
 
 public class Launcher {
 	
@@ -65,13 +66,16 @@ public class Launcher {
 	            default:
 	                throw new RuntimeException("Invalid browser name: " + br);
 	        }
+	        if (enableLogging) {
+	        		        	
+	        	driver = new EventFiringDecorator<WebDriver>(new WebEventListener()).decorate(driver);
 
+	        }
 	        driver.manage().window().maximize();
 	        driver.manage().deleteAllCookies();
 	        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(120));
-
-	        log.info("Navigating to URL: " + baseURL);
-	        driver.get(baseURL);
+	        
+	     //   driver.get(baseURL);
 
 	        // Single-user login
 	        if (singleUserLogin) {
@@ -86,26 +90,40 @@ public class Launcher {
 	    return driver;
 	}
 	
-	private static WebDriver launchNormalChrome() {
+	private static final boolean FULL_LOG = false;   // 🔷 Toggle here
 
-	    WebDriverManager.chromedriver().setup();
+	private static WebDriver launchNormalChrome() {
 
 	    ChromeOptions options = new ChromeOptions();
 	    options.setAcceptInsecureCerts(true);
 
+	    // ----- MINIMAL LOG MODE -----
+	    if (!FULL_LOG) {
+	        System.setProperty("webdriver.chrome.silentOutput", "true");  // reduces console noise
+	        System.setProperty("webdriver.chrome.verboseLogging", "false");
+	        options.addArguments("--log-level=3");                // 0=ALL, 1=INFO, 2=WARNING, 3=ERROR only
+	        options.addArguments("--silent");
+	        options.addArguments("--disable-logging");
+	        options.addArguments("--disable-dev-shm-usage");
+	        options.addArguments("--output=/dev/null");
+	    }
+
+	    // ----- Download Preference -----
 	    String downloadPath = BaseClass.DIR_PATH + "/files/download";
 	    Map<String, Object> prefs = new HashMap<>();
 	    prefs.put("download.default_directory", downloadPath);
 	    prefs.put("profile.default_content_settings.popups", 0);
 
 	    options.setExperimentalOption("prefs", prefs);
+
+	    // ----- Extension -----
 	    options.addExtensions(new File(BaseClass.DIR_PATH + "/files/extensions/disable_DownloadBar.crx"));
 
 	    return new ChromeDriver(options);
 	}
 
 	private static WebDriver launchHeadlessChrome() {
-	    WebDriverManager.chromedriver().setup();
+	  //  WebDriverManager.chromedriver().setup();
 
 	    ChromeOptions options = new ChromeOptions();
 	    options.addArguments("--headless=new");
@@ -116,18 +134,18 @@ public class Launcher {
 	}
 	
 	private static WebDriver launchFirefox() {
-	    WebDriverManager.firefoxdriver().setup();
+	 //   WebDriverManager.firefoxdriver().setup();
 	    return new FirefoxDriver();
 	}
 	
 	private static WebDriver launchInternetExplorer() {
-	    WebDriverManager.iedriver().setup();
+	//    WebDriverManager.iedriver().setup();
 	    return new InternetExplorerDriver();
 	}
 
 	private static WebDriver launchRemoteChrome() throws MalformedURLException {
 
-	    WebDriverManager.chromedriver().setup();
+	 //   WebDriverManager.chromedriver().setup();
 
 	    ChromeOptions options = new ChromeOptions();
 	    options.addArguments("--disable-gpu");
@@ -145,12 +163,7 @@ public class Launcher {
 		
 	private static void performAutoLogin(WebDriver driver, String moduleName, String workspaceName) {
 
-		BaseClass.test = BaseClass.extent.createTest("verifyLoginToApplication_503");
 
-	    ReadConfig config = new ReadConfig("");
-	    BaseClass.test.log(Status.INFO, "NG21-503");
-
-	    ExecutionVariables.issueKey = "NG21-503";
 	}
 
 

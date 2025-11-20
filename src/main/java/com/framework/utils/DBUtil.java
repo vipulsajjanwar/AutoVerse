@@ -6,13 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 public class DBUtil {
 	
 	private DBUtil() {}	
 	
-	private static final Logger log = LoggerFactory.getLogger(DBUtil.class);
+	public static final Logger log = LogManager.getLogger(DBUtil.class);
 
 	public static Connection getConnection(String host, String username, String password, String driverClass)
 			throws SQLException, ClassNotFoundException {
