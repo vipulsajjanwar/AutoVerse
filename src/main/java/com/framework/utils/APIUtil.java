@@ -32,11 +32,11 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.framwork.pojo.AuthConfig;
-import com.framwork.pojo.ConnectionProperty;
-import com.framwork.pojo.Info;
-import com.framwork.pojo.RequestPayLoads;
-import com.framwork.pojo.ServerConfig;
+import com.framework.pojo.AuthConfig;
+import com.framework.pojo.ConnectionProperty;
+import com.framework.pojo.Info;
+import com.framework.pojo.RequestPayLoads;
+import com.framework.pojo.ServerConfig;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -64,7 +64,7 @@ public class APIUtil {
 
 	private static final String ACCEPT = "Accept";
 	static final String FORM_URLENCODED = "application/x-www-form-urlencoded";
-
+/**
 	// Method to generate OAuth Bearer Token
 	public static String getOAuthBearerToken(String tokenURL, String username, String password) {
 		HttpURLConnection connection = null;
@@ -308,9 +308,7 @@ public class APIUtil {
 
 	private static final ObjectMapper mapper = new ObjectMapper();
 
-	/**
-	 * Send a GET request with Bearer token
-	 */
+	
 	public static Response sendGet(String url, String token) throws IOException {
 		Request request = new Request.Builder()
 				.url(url)
@@ -322,9 +320,6 @@ public class APIUtil {
 		return client.newCall(request).execute();
 	}
 
-	/**
-	 * Send a POST request with JSON payload and Bearer token
-	 */
 	public static Response sendPost(String url, Object bodyObj, String token) throws IOException {
 		String json = mapper.writeValueAsString(bodyObj);
 		RequestBody body = RequestBody.create(json, MediaType.get(APPLICATION_JSON));
@@ -339,9 +334,6 @@ public class APIUtil {
 		return client.newCall(request).execute();
 	}
 
-	/**
-	 * Send a PUT request with JSON payload and Bearer token
-	 */
 	public static Response sendPut(String url, Object bodyObj, String token) throws IOException {
 
 		String json = mapper.writeValueAsString(bodyObj);
@@ -358,8 +350,8 @@ public class APIUtil {
 		return client.newCall(request).execute();
 	}
 
-	/**
-	 * Send a DELETE request with optional body and Bearer token
+	
+	  Send a DELETE request with optional body and Bearer token
 
     public static Response sendDelete(String url, Object bodyObj, String token) throws IOException {
         RequestBody body = null;
@@ -382,16 +374,15 @@ public class APIUtil {
 
         return builder.build().let(client::newCall).execute();
     }
-	 */
-	/**
-	 * Generate OAuth2 token (password grant type)
-	 */
+	 
+	
+	  Generate OAuth2 token (password grant type)
+	
 	public static String generateOAuth2Token(String tokenUrl, String clientId, String username, String password) {
-		/**      
+		     
     	 String credentials = CLIENT_ID + ":" + CLIENT_SECRET;
        String encodedAuth = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-		 */
-
+		
 		String formData = "grant_type="+ URLEncoder.encode("password", StandardCharsets.UTF_8) +
 				"&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8) +
 				"&username=" + URLEncoder.encode(username, StandardCharsets.UTF_8) +
@@ -474,7 +465,7 @@ public class APIUtil {
 		return requestbody;
 
 	}
-
+*/
 	// Create request with JSON + Basic Auth + Optional Headers
 	private static RequestSpecification createRequest(String username, String password, Map<String, String> headers) {
 

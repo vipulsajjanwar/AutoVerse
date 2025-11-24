@@ -4,172 +4,183 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.mail.*;
+import javax.mail.internet.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.framework.utils.XLUtil;
-
 public class EmailIntegration {
 
-	public static final Logger log = LogManager.getLogger(EmailIntegration.class);
-	
-	private EmailIntegration() {}
-	
-	String brOpening="<br/>";
-	String tdOpeningStyle="<td style='padding: 12px; text-align: center; border: 1px solid #ddd; font-size: 10pt;'>";
-	String tdClosing="</td>";
-	
-	String emailHost="";
-	String mailPort="";
-	String username="";
-	String password="";
-	static String to="";
-	static String cc="";
-	static String bcc="";
-	static String mailSubject="";
-	
-	public void sendmailNew(String attachmentFile, StringBuilder mailBody){
+    private static final Logger log = LogManager.getLogger(EmailIntegration.class);
 
-		try {
-			
+    private final String smtpHost;
+    private final String smtpPort;
+    private final String username;
+    private final String password;
 
-			XLUtil xl = new XLUtil();
+    private EmailIntegration(Builder builder) {
+        this.smtpHost = builder.smtpHost;
+        this.smtpPort = builder.smtpPort;
+        this.username = builder.username;
+        this.password = builder.password;
+    }
 
-			// Create object of Property file
-			Properties props = new Properties();
+    // ============================
+    // ======= SEND EMAIL =========
+    // ============================
+    public void sendEmail(String subject, String htmlBody, 
+                          List<String> attachments, 
+                          String to, String cc, String bcc) {
 
-			// this will set host of server- you can change based on your requirement
-			props.put("mail.smtp.host", emailHost);
+        try {
+            Session session = createSession();
+            MimeMessage message = new MimeMessage(session);
 
-			// set the port of socket factory
-			props.put("mail.smtp.socketFactory.port", mailPort);
+            message.setFrom(new InternetAddress(username));
+            setRecipients(message, Message.RecipientType.TO, to);
+            setRecipients(message, Message.RecipientType.CC, cc);
+            setRecipients(message, Message.RecipientType.BCC, bcc);
+            message.setSubject(subject);
 
-			// set socket factory
-			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            MimeMultipart multipart = new MimeMultipart("mixed");
 
-			// set the authentication to true
-			props.put("mail.smtp.auth", "true");
+            // HTML body
+            MimeBodyPart htmlPart = new MimeBodyPart();
+            htmlPart.setContent(htmlBody, "text/html; charset=UTF-8");
+            multipart.addBodyPart(htmlPart);
 
-			// set the port of SMTP server
-			props.put("mail.smtp.port", mailPort);
+            // Attachments
+            if (attachments != null) {
+                for (String filePath : attachments) {
+                    addAttachment(multipart, filePath);
+                }
+            }
 
-			props.put("mail.smtp.starttls.enable", "true");
+            message.setContent(multipart);
 
-			// This will handle the complete authentication
-			Session session = Session.getDefaultInstance(props,
+            Transport.send(message);
+            log.info("Email sent successfully.");
 
-				new javax.mail.Authenticator() {
+        } catch (Exception e) {
+            log.error("Failed to send email: " + e.getMessage(), e);
+        }
+    }
 
-				protected PasswordAuthentication getPasswordAuthentication() {
+    // ============================
+    // ========== HELPERS =========
+    // ============================
 
-				return new PasswordAuthentication(username, password);
+    private Session createSession() {
+        Properties props = new Properties();
 
-				}
+        props.put("mail.smtp.host", smtpHost);
+        props.put("mail.smtp.port", smtpPort);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");  // TLS
+        props.put("mail.smtp.ssl.trust", smtpHost);
 
-			});
+        return Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+    }
 
-			try {
+    private void setRecipients(MimeMessage message, Message.RecipientType type, String recipients) throws MessagingException {
+        if (recipients != null && !recipients.trim().isEmpty()) {
+            message.setRecipients(type, InternetAddress.parse(recipients));
+        }
+    }
 
-				// Create object of MimeMessage class
-				Message message = new MimeMessage(session);
+    private void addAttachment(MimeMultipart multipart, String filePath) throws MessagingException {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            log.warn("Attachment file not found: " + filePath);
+            return;
+        }
 
-				// Set the from address
-				message.setFrom(new InternetAddress(username));
+        MimeBodyPart attachmentPart = new MimeBodyPart();
+        DataSource source = new FileDataSource(file);
 
-				// Set the recipient address
-				message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+        attachmentPart.setDataHandler(new DataHandler(source));
+        attachmentPart.setFileName(file.getName());
 
-				message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(cc));
+        multipart.addBodyPart(attachmentPart);
+        log.info("Attached: {}", file.getName());
+    }
 
-				message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(bcc));
+    // ============================
+    // ===== BASE64 ENCODER =======
+    // ============================
+    public String encodeBase64Image(String imagePath) throws IOException {
+        File file = new File(imagePath);
 
-				// Add the subject link
-				message.setSubject(mailSubject);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] bytes = fis.readAllBytes();
+            return Base64.getEncoder().encodeToString(bytes);
+        }
+    }
 
-				// Create object to add multimedia type content
-				BodyPart messageBodyPart1 = new MimeBodyPart();
+    // ============================
+    // ========= BUILDER ==========
+    // ============================
+    public static class Builder {
+        private String smtpHost;
+        private String smtpPort;
+        private String username;
+        private String password;
 
-				// Mention the file which you want to send
-				String fileLocation = attachmentFile;
-				String filename = fileLocation;
+        public Builder setHost(String host) {
+            this.smtpHost = host;
+            return this;
+        }
 
-				log.info(filename);
+        public Builder setPort(String port) {
+            this.smtpPort = port;
+            return this;
+        }
 
-				String file = xl.zipFile(filename, ".zip", fileLocation);
+        public Builder setUser(String user) {
+            this.username = user;
+            return this;
+        }
 
-				long size = xl.getFileSizeNIO(file);
+        public Builder setPassword(String pwd) {
+            this.password = pwd;
+            return this;
+        }
 
-				// Create object of MimeMultipart class
-				Multipart multipart = new MimeMultipart();
+        public EmailIntegration build() {
+            return new EmailIntegration(this);
+        }
+    }
+    
+    /**
+     * 
+     * 
+     * EmailIntegration mailer = new EmailIntegration.Builder()
+        .setHost("smtp.gmail.com")
+        .setPort("587")
+        .setUser("you@gmail.com")
+        .setPassword("app-password")
+        .build();
 
-				if(size<=33000)
-				{
-		
-					messageBodyPart1.setContent(mailBody.toString(), "text/html");
-					MimeBodyPart messageBodyPart2 = new MimeBodyPart();
+mailer.sendEmail(
+        "Automation Report",
+        htmlTemplate,
+        List.of("reports/extent.html", "logs/execution.log"),
+        "to@example.com",
+        "cc@example.com",
+        null
+);
 
-					// Create data source and pass the filename
-					DataSource source = new FileDataSource(file);
-
-					// set the handler
-					messageBodyPart2.setDataHandler(new DataHandler(source));
-
-					// set the file
-					messageBodyPart2.setFileName(new File(file).getName());
-
-					// add body part 1
-					multipart.addBodyPart(messageBodyPart2);
-
-				}
-				else 
-				{
-
-					messageBodyPart1.setContent(mailBody.toString(), "text/html");
-
-				}
-
-				// add body part 2
-				multipart.addBodyPart(messageBodyPart1);
-
-				// set the content
-				message.setContent(multipart);
-
-				// finally send the email
-				Transport.send(message);
-
-				log.info("=====Email Sent=====");
-
-			} catch (Exception e) {
-
-				log.error(e.getMessage());
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
-
-	}
-	public String encodeImageToBase64(String imagePath) throws IOException {
-	    File file = new File(imagePath);
-	    FileInputStream fileInputStream = new FileInputStream(file);
-	    byte[] imageBytes = new byte[(int) file.length()];
-	    fileInputStream.read(imageBytes);
-	    fileInputStream.close();
-	    return Base64.getEncoder().encodeToString(imageBytes);
-	}
+     */
 }

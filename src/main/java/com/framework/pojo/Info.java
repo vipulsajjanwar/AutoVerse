@@ -1,4 +1,4 @@
-package com.framwork.pojo;
+package com.framework.pojo;
 
 public class Info {
 	

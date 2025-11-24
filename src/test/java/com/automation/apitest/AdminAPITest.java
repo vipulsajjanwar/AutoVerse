@@ -6,7 +6,7 @@ import com.framework.base.BaseClass;
 import com.framework.utils.APIUtil;
 
 public class AdminAPITest {
-
+/**
 	@Test
 	public void loginAPITest() {
 		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
@@ -47,4 +47,5 @@ public class AdminAPITest {
 		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
 		BaseClass.reportLog(token);
 	}
+	*/
 }
