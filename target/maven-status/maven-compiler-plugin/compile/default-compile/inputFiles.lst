@@ -29,8 +29,8 @@ D:\Home\AutoVerse\src\main\java\com\framework\pojo\ConnectionProperty.java
 D:\Home\AutoVerse\src\main\java\com\automation\webpages\HomePage.java
 D:\Home\AutoVerse\src\main\java\com\automation\webpages\LoginPage.java
 D:\Home\AutoVerse\src\main\java\com\framework\restassured\RestAPI.java
+D:\Home\AutoVerse\src\main\java\com\automation\icedq\AdminServiceAPI.java
 D:\Home\AutoVerse\src\main\java\com\framework\report\ExtentManager.java
-D:\Home\AutoVerse\src\main\java\com\framework\utils\APIUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\utils\DataIntegrityUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\integration\XrayIntegration.java
 D:\Home\AutoVerse\src\main\java\com\framework\constant\Constant.java

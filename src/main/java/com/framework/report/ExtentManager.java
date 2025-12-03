@@ -26,35 +26,23 @@ public class ExtentManager {
 
     	String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 		String repName = ExecutionVariables.suitename + "-Suite-" + timeStamp + ".html";
+		
+		ExecutionVariables.reportFilePath = BaseClass.DIR_PATH + "/reports/" + BaseClass.buildId + "/" +
+				ExecutionVariables.suitename+timeStamp + "/"+repName;
 
-		System.setProperty("chaintest.generator.simple.output-file",
-				BaseClass.DIR_PATH + "/reports/" + BaseClass.buildId + "/" +
-						ExecutionVariables.suitename+timeStamp + "/"+repName);
+		//System.setProperty("chaintest.generator.simple.output-file", ExecutionVariables.reportFilePath);
 
-		ExtentSparkReporter spark = new ExtentSparkReporter(
-				BaseClass.DIR_PATH + "/reports/" + BaseClass.buildId + "/" +
-						ExecutionVariables.suitename+timeStamp+"/"+ repName);
+		ExtentSparkReporter spark = new ExtentSparkReporter(ExecutionVariables.reportFilePath);
 
-
+		
 		spark.config().setEncoding("utf-8");
-		spark.config().setTheme(Theme.DARK);
+		spark.config().setTheme(Theme.STANDARD);
 
 		spark.config().setDocumentTitle("Automation Execution Report");
 		spark.config().setReportName(ExecutionVariables.suitename);
 		spark.config().setTimeStampFormat("EEEE, MMMM dd, yyyy, hh:mm a");
-
-		// Custom JS (optional)
-		spark.config().setJS("""
-				    document.addEventListener('DOMContentLoaded', () => {
-				        console.log('Custom JS Loaded');
-				    });
-				""");
-
-		// Custom CSS (optional)
-		spark.config().setCSS("""
-				    .badge-primary { background-color: #0097e6 !important; }
-				    .nav-link.active { color: #fff !important; font-weight: bold; }
-				""");
+		
+		spark.config().setOfflineMode(true);     // Embeds CSS, JS, views into one file
 
 		extent = new ExtentReports();
 		extent.attachReporter(spark);

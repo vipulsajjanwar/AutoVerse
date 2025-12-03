@@ -42,6 +42,7 @@ public class BaseClass {
 	public static final String buildId = System.getProperty("build.id", "index-v1");
 	public static WebDriver driver;
 
+
 	@BeforeSuite(alwaysRun = true)
 	@Parameters({
 		"suiteName",
@@ -53,7 +54,7 @@ public class BaseClass {
 		"moduleName",
 		"workspaceName"
 	})
-	public void beforeSuite(
+	public static void beforeSuite(
 			String suiteName,
 			String testType,
 			String browser,
@@ -69,49 +70,17 @@ public class BaseClass {
 			// 1. Load Locators
 			// ---------------------------
 			ConfigManager.load(DIR_PATH +"/src/main/resources/config/constant.properties");
-			
+
 			PageUtil.beforesuite(DIR_PATH + ConfigManager.getString("icedq.locators.folder.path"));
 
 			ExecutionVariables.suitename = suiteName;
-
-			/*
-			 * // --------------------------- // 2. Setup Extent Reporting //
-			 * --------------------------- String timeStamp = new
-			 * SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()); String repName =
-			 * suiteName + "-Suite-" + timeStamp + ".html";
-			 * 
-			 * System.setProperty("chaintest.generator.simple.output-file", DIR_PATH +
-			 * "/reports/" + buildId + "/" + suiteName+timeStamp + "/"+repName);
-			 * 
-			 * ExtentSparkReporter spark = new ExtentSparkReporter( DIR_PATH + "/reports/" +
-			 * buildId + "/" + suiteName+timeStamp+"/"+ repName);
-			 * 
-			 * 
-			 * spark.config().setEncoding("utf-8"); spark.config().setTheme(Theme.DARK);
-			 * 
-			 * spark.config().setDocumentTitle("Automation Execution Report");
-			 * spark.config().setReportName(suiteName);
-			 * spark.config().setTimeStampFormat("EEEE, MMMM dd, yyyy, hh:mm a");
-			 * 
-			 * // Custom JS (optional) spark.config().setJS("""
-			 * document.addEventListener('DOMContentLoaded', () => { console.log('Custom JS
-			 * Loaded'); }); """);
-			 * 
-			 * // Custom CSS (optional) spark.config().setCSS(""" .badge-primary {
-			 * background-color: #0097e6 !important; } .nav-link.active { color: #fff
-			 * !important; font-weight: bold; } """);
-			 * 
-			 * extent = new ExtentReports(); extent.attachReporter(spark);
-			 * 
-			 * 
-			 * extent.setSystemInfo("Suite Name", suiteName); extent.setSystemInfo("OS",
-			 * System.getProperty("os.name")); extent.setSystemInfo("User",
-			 * System.getProperty("user.name")); extent.setSystemInfo("Java Version",
-			 * System.getProperty("java.version")); extent.setSystemInfo("Environment",
-			 * System.getProperty("env", "QA")); extent.setSystemInfo("Execution Time",
-			 * timeStamp);
-			 */
-			//    reportLog("Extent Report Initialized for suite: " + suiteName);
+			ExecutionVariables.testType =testType;
+			ExecutionVariables.browser =browser;
+			ExecutionVariables.baseURL=baseURL;
+			ExecutionVariables.userName=userName;
+			ExecutionVariables.password=password;
+			ExecutionVariables.moduleName=moduleName;
+			ExecutionVariables.workspaceName=workspaceName;
 
 			// ---------------------------
 			// 3. Launch Browser (if UI)
@@ -133,16 +102,16 @@ public class BaseClass {
 							workspaceName
 							);
 
-					
+
 				} else {
-					
+
 				}
 			} else {
-				
+
 			}
 
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -164,65 +133,66 @@ public class BaseClass {
 	@AfterSuite(alwaysRun = true)
 	public void tearDown() {
 
-		try {
 			log.info("🧹 Starting suite cleanup...");
-		} catch (Exception ignore) { }
-
+		
 		// -----------------------------
 		// 1. Flush Extent Report safely
 		// -----------------------------
 		try {
 			if (ExtentManager
-	                .getInstance() != null) {
+					.getInstance() != null) {
 				log.info("Flushing Extent Report...");
 				ExtentManager
-                .getInstance().flush();
-				
+				.getInstance().flush();
+
 			} else {
 				log.info("Extent was null → Nothing to flush.");
 			}
 		} catch (Exception e) {
-			log.info("Failed to flush Extent Report: " + e.getMessage());
+			log.error("Failed to flush Extent Report: {} " , e.getMessage(), e);
 		}
 
 		// -----------------------------
 		// 2. Close Browser safely
 		// -----------------------------
 		try {
-			if (driver != null) {
-				log.info("Closing browser session...");
-				driver.quit();
-				driver = null;
-			} else {
-				log.info("Driver was null → Browser already closed or not launched.");
+			if (ExecutionVariables.testType != null && ExecutionVariables.testType.trim().equalsIgnoreCase("ui")) {
+				if (driver != null) {
+					log.info("Closing browser session...");
+					driver.quit();
+					driver = null;
+				} else {
+					log.info("Driver was null → Browser already closed or not launched.");
+				}
 			}
 		} catch (Exception e) {
-			log.info("Error closing browser: " + e.getMessage());
+			log.error("Error closing browser: {} " , e.getMessage(), e);
 		}
 
 		log.info(" Suite cleanup complete.");
+		log.info(" Test Report File => {} ",ExecutionVariables.reportFilePath);
 	}
 
 	public static void reportLog(String msg) {
 		ExtentManager.getTest().pass(msg);
-		
+
 		Reporter.log(msg);
 	}
 
 	public static void fail(String msg) {
 		ExtentManager.getTest().fail(msg);
-		
+
 		Reporter.log(msg);
 	}
 
 	@BeforeMethod
 	public void beforeMethod() {
-		
+
 	}
 
 	@AfterMethod
 	public void afterMethod() {
-		
+
 	}
 
 	public static void reportPassLog(String message) {
@@ -230,18 +200,21 @@ public class BaseClass {
 
 		try {
 			String screenshotPath = takeScreenshotForValidationFailure("reportPassLog", driver);
-			ExtentManager.getTest().log(Status.PASS, message + " :::::::: " + "reportPassLog",
-					MediaEntityBuilder.createScreenCaptureFromBase64String(screenshotPath).build());
-
+			if(!screenshotPath.isEmpty()) {
+				ExtentManager.getTest().log(Status.PASS, message + " :::::::: " + "reportPassLog",
+						MediaEntityBuilder.createScreenCaptureFromBase64String(screenshotPath).build());
+			}
 		} catch (IOException e) {
 			Reporter.log("Error observed while captruing screesnhot in reportPassLog method" + e.getMessage());
 		}
 		Reporter.log(message);
-		
-		
+
+
 	}
 
 	public static String takeScreenshotForValidationFailure(String methodName, WebDriver driver) throws IOException {
+
+		if(driver == null) return "";
 
 		String timestamp = new SimpleDateFormat("HH.mm.ss-MM-dd-yyyy").format(new Date());
 		TakesScreenshot ts = (TakesScreenshot) driver;
@@ -270,7 +243,8 @@ public class BaseClass {
 
 	public static String takeScreenshotForChainTestListener(String methodName, WebDriver driver) throws IOException {
 
-
+		if(driver == null) return "";
+		
 		String base64=null;
 
 		String timestamp = new SimpleDateFormat("HH.mm.ss-MM-dd-yyyy").format(new Date());
@@ -302,15 +276,15 @@ public class BaseClass {
 
 	public static void reportErrorLog(String message) {
 
-		ExtentManager.getTest().log(Status.ERROR, MarkupHelper.createLabel(message, ExtentColor.GREY));
+		ExtentManager.getTest().log(Status.WARNING, MarkupHelper.createLabel(message, ExtentColor.GREY));
 
 		try {
 
 			String screenshotPath = takeScreenshotForValidationFailure("reportErrorLog", driver);
-
-			ExtentManager.getTest().log(Status.FAIL, message + "::::::::" + "reportErrorLog",
-					MediaEntityBuilder.createScreenCaptureFromBase64String(screenshotPath).build());
-
+			if(!screenshotPath.isEmpty()) {
+				ExtentManager.getTest().log(Status.FAIL, message + "::::::::" + "reportErrorLog",
+						MediaEntityBuilder.createScreenCaptureFromBase64String(screenshotPath).build());
+			}
 		} catch (IOException e) {
 			Reporter.log("Error observed while captruing screesnhot in reportErrorLog method" + e.getMessage());
 		}
@@ -323,10 +297,10 @@ public class BaseClass {
 		String screenshotPath =null;
 		try {
 			screenshotPath = takeScreenshotForValidationFailure(methodname, driver);
-
-			ExtentManager.getTest().log(Status.FAIL, message + "::::::::" + methodname,
-					MediaEntityBuilder.createScreenCaptureFromBase64String(screenshotPath).build());
-
+			if(!screenshotPath.isEmpty()) {
+				ExtentManager.getTest().log(Status.FAIL, message + "::::::::" + methodname,
+						MediaEntityBuilder.createScreenCaptureFromBase64String(screenshotPath).build());
+			}
 		} catch (IOException e) {
 			Reporter.log("Error observed while captruing screesnhot in reportFailLog method" + e.getMessage());
 		}
@@ -368,29 +342,29 @@ public class BaseClass {
 
 		String fullTestName = testcaseId + " - " + testcaseName;
 
-	    // Create Extent test
-	    ExtentTest test = ExtentManager
-	            .getInstance()
-	            .createTest(fullTestName)
-	            .assignCategory(testCatagory)
-	            .assignAuthor(authorName);
+		// Create Extent test
+		ExtentTest test = ExtentManager
+				.getInstance()
+				.createTest(fullTestName)
+				.assignCategory(testCatagory)
+				.assignAuthor(authorName);
 
-	    // Attach test instance to thread
-	    ExtentManager.setTest(test);
+		// Attach test instance to thread
+		ExtentManager.setTest(test);
 
-	    // Log basic test info
-	    test.log(Status.INFO, "TestCase ID: " + testcaseId);
-	    test.log(Status.INFO, "Category: " + testCatagory);
-	    test.log(Status.INFO, "Author: " + authorName);
+		// Log basic test info
+		test.log(Status.INFO, "TestCase ID: " + testcaseId);
+		test.log(Status.INFO, "Category: " + testCatagory);
+		test.log(Status.INFO, "Author: " + authorName);
 
-	    // Set Execution variables
-	    ExecutionVariables.issueKey = testcaseId;
-	    ExecutionVariables.testName = testcaseName;
-	    ExecutionVariables.catagory = testCatagory;
-	    ExecutionVariables.author = authorName;
+		// Set Execution variables
+		ExecutionVariables.issueKey = testcaseId;
+		ExecutionVariables.testName = testcaseName;
+		ExecutionVariables.catagory = testCatagory;
+		ExecutionVariables.author = authorName;
 
-	    // Log to console (Log4j)
-	    log.info("STARTING TEST → " + fullTestName + " | Category: " + testCatagory + " | Author: " + authorName);
+		// Log to console (Log4j)
+		log.info("STARTING TEST → " + fullTestName + " | Category: " + testCatagory + " | Author: " + authorName);
 	}
 
 }

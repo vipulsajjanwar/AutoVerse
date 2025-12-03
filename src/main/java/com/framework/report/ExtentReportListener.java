@@ -33,7 +33,7 @@ public class ExtentReportListener implements ITestListener {
 
 		ExecutionVariables.reportDocPath = XLUtil.createWorkBook(BaseClass.DIR_PATH+"/src/main/resources/reportdoc", ExecutionVariables.suitename, ".xlsx");
 		ReportDocument = ExecutionVariables.reportDocPath;
-		log.info("","Exection status report doc path :: "+ReportDocument);
+		log.info("Execution status report doc path :: {}", ReportDocument);
 	}
 
 	@Override
@@ -45,19 +45,19 @@ public class ExtentReportListener implements ITestListener {
 	@Override
 	public void onTestSuccess(ITestResult result) {
 		 ExtentManager.getTest().pass("Test Passed");
-		log.info("The name of the testcase passed is :"+result.getName());	
+		log.info("The name of the testcase passed is  : {}", result.getName());	
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result) {
 		 ExtentManager.getTest().fail(result.getThrowable());
-		log.info("The name of the testcase failed is :"+result.getName());	
+		log.info("The name of the testcase failed is :{}", result.getName());	
 	}
 
 	@Override
 	public void onTestSkipped(ITestResult result) {
 		 ExtentManager.getTest().skip("Test Skipped");
-		log.info("The name of the testcase skipped is :"+result.getName());	
+		log.info("The name of the testcase skipped is :{}", result.getName());	
 	}
 
 	@Override

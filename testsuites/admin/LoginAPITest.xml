@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" > 
+
+<suite name="Login_APITest_Suite" parallel="tests" thread-count="1">
+
+
+	<parameter name="testType" value="api" />
+	<parameter name="browser" value="" />
+	<parameter name="applicationURL" value="https://192.168.100.35:32222/" />
+	<parameter name="userName" value="vipuls" />
+	<parameter name="password" value="Admin@123" />
+	<parameter name="executionKey" value="" />
+	<parameter name="moduleName" value="administration"/>
+	<parameter name="workspaceName" value="Automation_DND_2" /> 
+	<parameter name="suiteName" value="Login_APITest_Suite"/>
+	
+	<test name="Login API testing">
+		
+		<classes>		
+			
+			<class name = "com.automation.apitest.AdminAPITest">		
+						
+				<methods>
+									
+					<include name = "test_GenerateToken"/>
+					<include name="test_CreateUserAPI"/>
+									
+				</methods>
+				
+		 	</class>	
+		 		
+		</classes>
+		
+	</test>
+	
+</suite>

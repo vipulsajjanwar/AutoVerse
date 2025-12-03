@@ -38,5 +38,15 @@ public class ExecutionVariables {
 	public static String author="";
 	
 	public static String icedqUser="";
+	
+	
+	public static String testType="";
+	public static String browser="";
+	public static String baseURL="";
+	public static String userName="";
+	public static String password="";
+	public static String moduleName="";
+	public static String workspaceName="";
+	public static String reportFilePath="";
 
 }

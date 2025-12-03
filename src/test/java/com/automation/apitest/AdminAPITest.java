@@ -1,51 +1,62 @@
 package com.automation.apitest;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import com.automation.icedq.AdminServiceAPI;
 import com.framework.base.BaseClass;
-import com.framework.utils.APIUtil;
+import com.framework.constant.ApiConstants;
+import com.framework.report.ExtentReportListener;
+import com.framework.restassured.RestAPI;
 
-public class AdminAPITest {
-/**
-	@Test
-	public void loginAPITest() {
-		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
-		BaseClass.reportLog(token);
-	}
+
+@Listeners(ExtentReportListener.class)
+public class AdminAPITest extends BaseClass{
 
 	@Test
-	public void createUserAPITest() {
-		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
-		BaseClass.reportLog(token);
-	}
+	public void test_GenerateToken() {
 
-	@Test
-	public void retrieveUserAPITest() {
-		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
-		BaseClass.reportLog(token);
-	}
+		try {
+			logTestInfo("icedq-Login-api1", "Generate token", "Login", "Vipul S.");
 
-	@Test
-	public void updateUserAPITest() {
-		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
-		BaseClass.reportLog(token);
-	}
-	@Test
-	public void assignToUserAPITest() {
-		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
-		BaseClass.reportLog(token);
+			String token = RestAPI.generateAuthToken("http://192.168.100.35:42445/auth/realms/icedq/protocol/openid-connect/token", "vipuls", "Admin@123");
+
+			reportLog(String.format("Generated Token: %s", token));
+		} catch (Exception e) {
+			BaseClass.reportErrorLog(e.getMessage());
+		}
 	}
 
 	@Test
-	public void revokeAccessUserAPITest() {
-		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
-		BaseClass.reportLog(token);
-	}
+	public void test_CreateUserAPI() {
 
-	@Test
-	public void deleteUserAPITest() {
-		String token = APIUtil.generateOAuth2Token("http://qa.onprem.icedq.com:8080/auth/realms/icedq.qa/protocol/openid-connect/token","icedq.admin-ui", "vipuls", "Admin@123");
-		BaseClass.reportLog(token);
+		try {
+			logTestInfo("icedq-user-api-1", "Create User API", "Users", "Vipul S.");
+
+	//		RestAPI.generateAuthToken("http://192.168.100.35:42445/auth/realms/icedq/protocol/openid-connect/token", "vipuls", "Admin@123");
+
+			AdminServiceAPI adapi = new AdminServiceAPI();
+			
+			 // Request body
+		    Map<String, Object> requestBody = new HashMap<>();
+		    requestBody.put("userName", "test123");
+		    requestBody.put("firstName", "John");
+		    requestBody.put("lastName", "Doe");
+		    requestBody.put("email", "john@example.com");
+		    requestBody.put("tempCredential", "Pass@123");
+		    
+		    Map<String, String> expectedJsonValidation = Map.of(
+			        "userName", "test123",
+			        "firstName", "John"
+			);
+			
+			adapi.createUserTest("http://192.168.100.35:42445/api/v1/users", ApiConstants.getAuthToken(), null, requestBody, "200", expectedJsonValidation);
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog(e.getMessage());
+		}
 	}
-	*/
 }

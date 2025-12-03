@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class RestAPIUtil {
 
-    private static final Logger log = LogManager.getLogger(APIUtil.class);
+    private static final Logger log = LogManager.getLogger(RestAPIUtil.class);
     private static final OkHttpClient client = new OkHttpClient();
 
     private RestAPIUtil() {}

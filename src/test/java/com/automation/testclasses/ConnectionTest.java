@@ -1,8 +1,5 @@
 package com.automation.testclasses;
 
-import com.framework.utils.APIUtil;
-
-
 public class ConnectionTest {
 
 	

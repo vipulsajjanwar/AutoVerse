@@ -35,7 +35,7 @@ com\framework\ai\AIScriptGenerator.class
 com\framework\constant\JsonPathConstants.class
 com\framework\utils\PageUtil.class
 com\framework\ai\CodeGenController.class
-com\framework\utils\APIUtil.class
+com\automation\icedq\AdminServiceAPI.class
 com\automation\webpages\LoginPage.class
 com\framework\constant\DefaultValues.class
 com\automation\icedq\IcedqLoginPage.class

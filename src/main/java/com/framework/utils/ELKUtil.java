@@ -28,7 +28,7 @@ public class ELKUtil {
 	public static void sendDetailsToElk(String testCaseId, String requestBodyContent ) {
 
 		try {
-			if(!flag) {	}
+			if(!flag) return;
 
 			String xrayid = testCaseId;
 
@@ -37,14 +37,14 @@ public class ELKUtil {
 
 			OkHttpClient client = new OkHttpClient().newBuilder().build();
 
-			MediaType mediaType = MediaType.parse(APIUtil.APPLICATION_JSON);
+			MediaType mediaType = MediaType.parse("application/json");
 
 			RequestBody body = RequestBody.create(requestBodyContent, mediaType);
 
 			String elkdocURL = elkurl+xrayid;
 
-			log.info("ElasticSearch Request URL: "+elkdocURL);
-			log.info("ElasticSearch Request body: "+requestBodyContent);
+			log.info("ElasticSearch Request URL: {}",elkdocURL);
+			log.info("ElasticSearch Request body: {}",requestBodyContent);
 
 			Request request = new Request.Builder()
 
@@ -60,11 +60,11 @@ public class ELKUtil {
 
 			/**	Assert.assertEquals(response.code(), 201);*/
 
-			log.info("ElasticSearch Response code: "+response.code());
+			log.info("ElasticSearch Response code: {}",response.code());
 
 			String responseBody = response.body().string(); // Get the response body as a string
 
-			log.info("ElasticSearch Response Body: " + responseBody);  // Log the response body
+			log.info("ElasticSearch Response Body: {}", responseBody);  // Log the response body
 
 
 		} catch (Exception e) {
