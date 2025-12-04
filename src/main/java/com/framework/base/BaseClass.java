@@ -174,7 +174,7 @@ public class BaseClass {
 	}
 
 	public static void reportLog(String msg) {
-		ExtentManager.getTest().pass(msg);
+		ExtentManager.getTest().info(msg);
 
 		Reporter.log(msg);
 	}
@@ -365,6 +365,22 @@ public class BaseClass {
 
 		// Log to console (Log4j)
 		log.info("STARTING TEST → " + fullTestName + " | Category: " + testCatagory + " | Author: " + authorName);
+	}
+	
+	public static void logSchemaAndResponse(String schemaJson, String responseJson) {
+
+	    String html = "<table border='1' style='width:100%; border-collapse:collapse;'>"
+	            + "<tr>"
+	            + "<th style='padding:8px;'>Schema</th>"
+	            + "<th style='padding:8px;'>Response</th>"
+	            + "</tr>"
+	            + "<tr>"
+	            + "<td style='max-height:300px; overflow:auto; white-space:pre-wrap;'>" + schemaJson + "</td>"
+	            + "<td style='max-height:300px; overflow:auto; white-space:pre-wrap;'>" + responseJson + "</td>"
+	            + "</tr>"
+	            + "</table>";
+
+	    ExtentManager.getTest().info(html);  
 	}
 
 }

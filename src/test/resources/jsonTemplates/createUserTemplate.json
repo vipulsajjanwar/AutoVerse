@@ -1,0 +1,7 @@
+{
+  "userName": "$userName",
+  "firstName": "$firstName",
+  "lastName": "$lastName",
+  "email": "$email",
+  "tempCredential": "$tempCredential"
+}

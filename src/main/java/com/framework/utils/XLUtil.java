@@ -14,7 +14,9 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -31,6 +33,9 @@ import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -694,4 +699,36 @@ public class XLUtil {
 
 		return rowCount - 1; // subtracting header row
 	}
+	
+	public static List<Map<String, String>> readExcel(String filePath, String sheetName) {
+        List<Map<String, String>> dataList = new ArrayList<>();
+
+        try (FileInputStream fis = new FileInputStream(filePath);
+             Workbook workbook = WorkbookFactory.create(fis)) {
+
+            Sheet sheet = workbook.getSheet(sheetName);
+
+            Row headerRow = sheet.getRow(0);
+            int columnCount = headerRow.getLastCellNum();
+
+            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                Row row = sheet.getRow(rowIndex);
+                Map<String, String> dataMap = new HashMap<>();
+
+                for (int colIndex = 0; colIndex < columnCount; colIndex++) {
+                    String key = headerRow.getCell(colIndex).getStringCellValue();
+                    Cell cell = row.getCell(colIndex);
+
+                    String value = cell == null ? "" : cell.toString();
+                    dataMap.put(key, value);
+                }
+                dataList.add(dataMap);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed reading Excel file: " + filePath, e);
+        }
+
+        return dataList;
+    }
 }

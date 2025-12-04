@@ -160,6 +160,8 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.15.2</version>
 		</dependency>
+		
+		
 
 		<!-- ================== HTTP Clients ================== -->
 		<dependency>
@@ -229,6 +231,12 @@
 			<groupId>org.bytedeco</groupId>
 			<artifactId>ffmpeg-platform</artifactId>
 			<version>5.1.2-1.5.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>5.4.0</version>
 		</dependency>
 
 		<!-- SparkJava for lightweight web server -->

@@ -4,6 +4,8 @@ package com.framework.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,7 +17,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 
 public class JsonUtil {
-	
+
 	private JsonUtil(){}
 
 
@@ -34,7 +36,7 @@ public class JsonUtil {
 	private static final ObjectMapper mapper = new ObjectMapper()
 			.enable(SerializationFeature.INDENT_OUTPUT);  // pretty JSON
 
-			// ---------------------- READ JSON ----------------------
+	// ---------------------- READ JSON ----------------------
 	public static <T> T readJson(String filePath, Class<T> clazz) {
 		try {
 			return mapper.readValue(new File(filePath), clazz);
@@ -106,4 +108,39 @@ public class JsonUtil {
 		return new File(filePath).exists();
 	}
 
+	public static String loadJsonTemplate(String filePath) {
+		try {
+			return new String(Files.readAllBytes(Paths.get(filePath)));
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to read JSON Template: " + filePath, e);
+		}
+	}
+
+	public static String applyData(String jsonTemplate, Map<String, String> data) {
+		String processedJson = jsonTemplate;
+
+		for (Map.Entry<String, String> entry : data.entrySet()) {
+			processedJson = processedJson.replace("$" + entry.getKey(), entry.getValue());
+		}
+
+		return processedJson;
+	}
+
+	public static String readJsonAsPrettyString(String filePath) {
+		try {
+			Object json = mapper.readValue(new File(filePath), Object.class);
+			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to read JSON file as pretty string: " + filePath, e);
+		}
+	}
+
+	public static String toPrettyJson(Object object) {
+	    try {
+	        ObjectMapper mapper = new ObjectMapper();
+	        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+	    } catch (Exception e) {
+	        return "Failed to convert object to pretty JSON: " + e.getMessage();
+	    }
+	}
 }

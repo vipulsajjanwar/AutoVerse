@@ -1,0 +1,9 @@
+{
+  "search": [
+    {
+      "attribute": "$attribute",
+      "operator": "$operator",
+      "value": "$value"
+    }
+  ]
+}
