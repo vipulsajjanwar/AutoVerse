@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -16,7 +15,13 @@ import javax.mail.internet.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class EmailIntegration {
+import com.framework.base.BaseClass;
+import com.framework.constant.Constant;
+import com.framework.utils.FileUtil;
+import com.framework.utils.MailUtil;
+import com.framework.variables.ExecutionVariables;
+
+public class EmailIntegration extends MailUtil {
 
     private static final Logger log = LogManager.getLogger(EmailIntegration.class);
 
@@ -31,15 +36,22 @@ public class EmailIntegration {
         this.username = builder.username;
         this.password = builder.password;
     }
+    
+    
 
     // ============================
     // ======= SEND EMAIL =========
     // ============================
-    public void sendEmail(String subject, String htmlBody, 
-                          List<String> attachments, 
+    public void sendEmail(String subject, 
+                          String attachments, 
                           String to, String cc, String bcc) {
 
         try {
+        	
+        	String base64Image = MailUtil.encodeImageToBase64(BaseClass.DIR_PATH + "/src/main/resources/assets/icedq-logo.png");
+        	String base64Icon = MailUtil.encodeImageToBase64(BaseClass.DIR_PATH + "/src/main/resources/assets/icedqIcon.png");
+        	
+        	
             Session session = createSession();
             MimeMessage message = new MimeMessage(session);
 
@@ -53,15 +65,28 @@ public class EmailIntegration {
 
             // HTML body
             MimeBodyPart htmlPart = new MimeBodyPart();
-            htmlPart.setContent(htmlBody, "text/html; charset=UTF-8");
+         // Set the body of email
+			StringBuilder mailBody = new StringBuilder();
+			
+			mailBody.append("<html><body style='font-family:Arial;background:#f4f4f9;padding:20px;'>")
+            .append("<div style='max-width:900px;margin:auto;background:white;border-radius:8px;padding:20px;'>")
+
+            .append(buildHeaderSection(base64Image))
+            .append(buildTableSection(ExecutionVariables.startTime, ExecutionVariables.endTime, ExecutionVariables.suitename, ExecutionVariables.workspaceName, ExecutionVariables.passedTC,  ExecutionVariables.failedTC,  ExecutionVariables.skippedTC))
+            .append(buildLinksSection(ExecutionVariables.baseURL, ExecutionVariables.totalcount, Constant.MAIL_SUBJECT))
+            .append(buildXraySection("", ""))
+            .append(buildKibanaSection(Constant.ELK_ENABLE, ExecutionVariables.suiteType, Constant.KIBANA_URL, Constant.KIBANA_URL, Constant.KIBANA_URL, ExecutionVariables.buildID))
+            .append(buildReportSection(ExecutionVariables.suitename))
+            .append(buildFooterSection("AutoVerse"))
+            .append(buildSignatureSection(base64Icon, "vipul.s"))
+
+            .append("</div></body></html>");
+            
+            
+            htmlPart.setContent(mailBody.toString(), "text/html; charset=UTF-8");
             multipart.addBodyPart(htmlPart);
 
-            // Attachments
-            if (attachments != null) {
-                for (String filePath : attachments) {
-                    addAttachment(multipart, filePath);
-                }
-            }
+            addFolderAsZipAttachment(multipart, attachments);
 
             message.setContent(multipart);
 
@@ -79,12 +104,13 @@ public class EmailIntegration {
 
     private Session createSession() {
         Properties props = new Properties();
-
+        
         props.put("mail.smtp.host", smtpHost);
         props.put("mail.smtp.port", smtpPort);
+        props.put("mail.smtp.socketFactory.port", smtpPort);
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");  // TLS
-        props.put("mail.smtp.ssl.trust", smtpHost);
+        props.put("mail.smtp.starttls.enable", "true");
 
         return Session.getInstance(props, new Authenticator() {
             @Override
@@ -100,7 +126,7 @@ public class EmailIntegration {
         }
     }
 
-    private void addAttachment(MimeMultipart multipart, String filePath) throws MessagingException {
+    public void addAttachment(MimeMultipart multipart, String filePath) throws MessagingException {
         File file = new File(filePath);
         if (!file.exists()) {
             log.warn("Attachment file not found: " + filePath);
@@ -115,6 +141,32 @@ public class EmailIntegration {
 
         multipart.addBodyPart(attachmentPart);
         log.info("Attached: {}", file.getName());
+    }
+    
+    private void addFolderAsZipAttachment(MimeMultipart multipart, String folderPath) throws MessagingException {
+        File folder = new File(folderPath);
+        if (!folder.exists() || !folder.isDirectory()) {
+            log.warn("Folder not found: " + folderPath);
+            return;
+        }
+
+        try {
+            // Create ZIP file in temp location
+            String zipFilePath = folder.getParent() + "/" + folder.getName() + ".zip";
+            FileUtil.zipFolder(folderPath, zipFilePath);
+
+            // Attach ZIP file
+            MimeBodyPart attachmentPart = new MimeBodyPart();
+            DataSource source = new FileDataSource(zipFilePath);
+            attachmentPart.setDataHandler(new DataHandler(source));
+            attachmentPart.setFileName(new File(zipFilePath).getName());
+
+            multipart.addBodyPart(attachmentPart);
+            log.info("Attached folder as ZIP: {}", zipFilePath);
+
+        } catch (IOException e) {
+            log.error("Failed to zip folder: " + folderPath, e);
+        }
     }
 
     // ============================

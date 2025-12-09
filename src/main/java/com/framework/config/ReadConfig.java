@@ -7,41 +7,46 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.framework.base.BaseClass;
-
 
 public class ReadConfig {
 	
 	Properties pro;
 	public static final Logger log = LogManager.getLogger(ReadConfig.class);
 	
-
 	public ReadConfig(String folderPath)
 	{
-		File folder = new File(BaseClass.DIR_PATH+folderPath);
-		File[] listOfFiles = folder.listFiles();
+		try {
+			 pro = new Properties(); // initialize here
+			  
+			File folder = new File(folderPath);
+			File[] listOfFiles = folder.listFiles();
+			
+			folderPath = folderPath.endsWith("/") ? folderPath : folderPath+"/";
+			
+			for (int i = 0; i < listOfFiles.length; i++) {
+				if (listOfFiles[i].isFile()) {
+					log.info("File " + listOfFiles[i].getName());
 
-		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isFile()) {
-				log.info("File " + listOfFiles[i].getName());
+					Properties prop2 = new Properties();
+					
+					File src = new File(folderPath + listOfFiles[i].getName());
 
-				Properties prop2 = new Properties();
+					try (FileInputStream fis = new FileInputStream(src);){
 
-				File src = new File(folderPath + listOfFiles[i].getName());
+						prop2.load(fis);
 
-				try (FileInputStream fis = new FileInputStream(src);){
+						pro.putAll(prop2);
+					} catch (Exception e) {
+						log.info("Exception is " + e.getMessage());
 
-					prop2.load(fis);
+					}
 
-					pro.putAll(prop2);
-				} catch (Exception e) {
-					log.info("Exception is " + e.getMessage());
-
+				} else if (listOfFiles[i].isDirectory()) {
+					log.info("Directory " + listOfFiles[i].getName());
 				}
-
-			} else if (listOfFiles[i].isDirectory()) {
-				log.info("Directory " + listOfFiles[i].getName());
 			}
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to initialize ReadConfig in Constant class", e);
 		}
 	}
 

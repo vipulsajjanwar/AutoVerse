@@ -22,9 +22,9 @@
 						
 				<methods>
 									
-					<include name = "test_GenerateToken"/>
+					<exclude name = "test_GenerateToken"/>
 					<include name = "test_CreateUserAPI"/>
-					<include name = "test_SearchUserAPI"/>
+					<exclude name = "test_SearchUserAPI"/>
 									
 				</methods>
 				

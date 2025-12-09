@@ -44,6 +44,8 @@ public class Constant {
 	public static final String MAIL_EMAIL_SIGNATURE =
 	        readconfig.getProperty("Mail.EMAILSIGNATURE");
 
+	public static final boolean MAIL_SENT_FLAG =
+	        Boolean.parseBoolean(readconfig.getProperty("Mail.enable"));
 	
 	// ---------------- Database Credentials ----------------
 
@@ -72,6 +74,9 @@ public class Constant {
 
 	public static final String ELK_PASSWORD =
 	        readconfig.getProperty("elk.password");
+	
+	public static final boolean ELK_ENABLE =
+	        Boolean.parseBoolean(readconfig.getProperty("elk.enable"));
 	
 	// ---------------- Session Timeouts & Waits ----------------
 

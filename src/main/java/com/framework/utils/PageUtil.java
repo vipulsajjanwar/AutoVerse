@@ -7,6 +7,8 @@ import java.util.Properties;
 
 
 import com.framework.base.BaseClass;
+import com.framework.variables.ExecutionVariables;
+
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,6 +83,15 @@ public class PageUtil {
 				log.info("Directory " + listOfFiles[i].getName());
 			}
 		}
+		
+		ExecutionVariables.totalcount = 0;
+		ExecutionVariables.passedTC = 0;
+		ExecutionVariables.failedTC = 0;
+		ExecutionVariables.skippedTC = 0;
+		ExecutionVariables.test = 0;
+		ExecutionVariables.catagory="";
+		ExecutionVariables.testName="";
+		ExecutionVariables.author="";
 
 	}
 

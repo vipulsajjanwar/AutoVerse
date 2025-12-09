@@ -27,8 +27,10 @@ public class ExtentManager {
     	String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
 		String repName = ExecutionVariables.suitename + "-Suite-" + timeStamp + ".html";
 		
-		ExecutionVariables.reportFilePath = BaseClass.DIR_PATH + "/reports/" + BaseClass.buildId + "/" +
-				ExecutionVariables.suitename+timeStamp + "/"+repName;
+		ExecutionVariables.reportFileFolder=BaseClass.DIR_PATH + "/reports/" + BaseClass.buildId + "/" +
+				ExecutionVariables.suitename+timeStamp;
+		
+		ExecutionVariables.reportFilePath = ExecutionVariables.reportFileFolder + "/"+repName;
 
 		//System.setProperty("chaintest.generator.simple.output-file", ExecutionVariables.reportFilePath);
 

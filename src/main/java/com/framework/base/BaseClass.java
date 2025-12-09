@@ -6,7 +6,6 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +18,7 @@ import org.openqa.selenium.WebDriverException;
 import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Parameters;
@@ -30,6 +30,9 @@ import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.markuputils.ExtentColor;
 import com.aventstack.extentreports.markuputils.MarkupHelper;
 import com.framework.config.ConfigManager;
+import com.framework.constant.ApiConstants;
+import com.framework.constant.Constant;
+import com.framework.integration.EmailIntegration;
 import com.framework.report.ExtentManager;
 import com.framework.utils.PageUtil;
 import com.framework.variables.ExecutionVariables;
@@ -42,7 +45,11 @@ public class BaseClass {
 	public static final String buildId = System.getProperty("build.id", "index-v1");
 	public static WebDriver driver;
 
+	public static final String APIBASEURL = "http://192.168.100.35:42445/";
+	public static final String TOKENPATHPARAM = "auth/realms/icedq/protocol/openid-connect/token";
 
+	public static final String SCHEMAFOLDERPATH = BaseClass.DIR_PATH + "/src/test/resources/schemas/";
+	 
 	@BeforeSuite(alwaysRun = true)
 	@Parameters({
 		"suiteName",
@@ -69,6 +76,7 @@ public class BaseClass {
 			// ---------------------------
 			// 1. Load Locators
 			// ---------------------------
+						
 			ConfigManager.load(DIR_PATH +"/src/main/resources/config/constant.properties");
 
 			PageUtil.beforesuite(DIR_PATH + ConfigManager.getString("icedq.locators.folder.path"));
@@ -171,7 +179,45 @@ public class BaseClass {
 
 		log.info(" Suite cleanup complete.");
 		log.info(" Test Report File => {} ",ExecutionVariables.reportFilePath);
+		
+		sendMail(ExecutionVariables.reportFileFolder);
+		
 	}
+	
+	public void sendMail(String reportFilePath) {
+
+		try {
+			if(!Constant.MAIL_SENT_FLAG) { return ;}
+
+			EmailIntegration mailer = new EmailIntegration.Builder()
+					.setHost(Constant.MAIL_EMAIL_HOST)
+					.setPort(Constant.MAIL_PORT)
+					.setUser(Constant.MAIL_USERNAME)
+					.setPassword(Constant.MAIL_PASSWORD)
+					.build();
+
+			mailer.sendEmail(
+					Constant.MAIL_SUBJECT,
+					reportFilePath,
+					Constant.MAIL_TO,
+					Constant.MAIL_CC,
+					Constant.MAIL_BCC
+					);
+		} catch (Exception e) {
+			log.error("Error sendMail: {} " , e.getMessage(), e);
+		}
+	}
+	
+	@AfterTest
+	public void afterTest() {
+		if(ApiConstants.getAuthToken() != null) {
+			ApiConstants.setAuthToken(null);
+		}
+		ExecutionVariables.totalcount = ExecutionVariables.test - ExecutionVariables.retryFlagCount;
+	}
+	
+	
+	
 
 	public static void reportLog(String msg) {
 		ExtentManager.getTest().info(msg);

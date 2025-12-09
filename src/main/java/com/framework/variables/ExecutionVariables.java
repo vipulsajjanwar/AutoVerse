@@ -8,10 +8,13 @@ public class ExecutionVariables {
 	public static String documentTitle="";
 	public static  List<String> screenShots ;
 	public static   String screenshotPath = "";
+	
+	public static String startTime;
+	public static String endTime;
 
 	public static int failedTC;
 	public static int passedTC;
-	public static int testskip;
+	public static int skippedTC;
 	public static int test;
 	public static String suitename = "";
 
@@ -48,5 +51,12 @@ public class ExecutionVariables {
 	public static String moduleName="";
 	public static String workspaceName="";
 	public static String reportFilePath="";
+	public static String reportFileFolder;
+	
+	public static String suiteType;
+	public static String buildID;
+	public static String buildType;
+	public static String releaseID;
+	public static String releaseType;
 
 }
