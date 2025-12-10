@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GroupSchema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "This is the group id.",
+      "example": "346c5aa6-c92d-4aa8-8abd-c4b90d8ce63e"
+    },
+    "name": {
+      "type": "string",
+      "description": "This is the group name.",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^[a-zA-Z0-9-_.@]+$",
+      "example": "ConsumerQAGroup"
+    },
+    "path": {
+      "type": "string",
+      "description": "This is the group's path.",
+      "example": "/ConsumerQAGroup"
+    },
+    "description": {
+      "type": "string",
+      "description": "This is the group's description.",
+      "minLength": 1,
+      "maxLength": 255,
+      "pattern": "^$|^[a-zA-Z0-9-_., ]+$",
+      "example": "Consumer transactions and activities"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Username of the person who created the group.",
+      "example": "JohnDoe"
+    },
+    "updatedBy": {
+      "type": "string",
+      "description": "Username of the person who updated the group.",
+      "example": "JohnDoe"
+    },
+    "createdTimestamp": {
+      "type": "string",
+      "description": "Timestamp when the group was created.",
+      "example": "02/22/2023 12:56:58 UTC"
+    },
+    "updatedTimestamp": {
+      "type": "string",
+      "description": "Timestamp when the group was updated.",
+      "example": "02/22/2023 12:56:58 UTC"
+    },
+    "roles": {
+      "type": "array",
+      "description": "Roles assigned to the group.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "federatedIdentity": {
+      "type": "string",
+      "description": "Group associated federated identity.",
+      "example": "Local"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

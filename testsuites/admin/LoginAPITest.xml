@@ -22,9 +22,15 @@
 						
 				<methods>
 									
-					<exclude name = "test_GenerateToken"/>
-					<include name = "test_CreateUserAPI"/>
-					<include name = "test_SearchUserAPI"/>
+					<include name = "testGenerateToken"/>
+					<include name = "testCreateUserAPI"/>
+					<include name = "testRetrieveUserAPI"/>
+					<include name = "testUpdateUserAPI"/>
+					<include name = "testSearchUserAPI"/>
+					<include name = "testDeleteUserAPI"/>
+					
+					<include name = "testCreateGroupAPI"/>
+					<include name = "testRetrieveGroupAPI"/>
 									
 				</methods>
 				

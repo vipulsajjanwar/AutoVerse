@@ -20,6 +20,7 @@ import org.testng.asserts.SoftAssert;
 
 import com.framework.base.BaseClass;
 import com.framework.constant.ApiConstants;
+import com.framework.enums.ApiErrorMessage;
 
 import io.restassured.http.Header;
 import io.restassured.module.jsv.JsonSchemaValidator;
@@ -220,10 +221,10 @@ public class RestAPIUtil {
 				}
 
 				BaseClass.reportLog("Schema Validation Started: " + schemaPath);
+				
+				BaseClass.logSchemaAndResponse(JsonUtil.readJsonAsPrettyString(schemaPath), response.asPrettyString());
 
 				response.then().assertThat().body(JsonSchemaValidator.matchesJsonSchema(new File(schemaPath)));
-
-				BaseClass.logSchemaAndResponse(JsonUtil.readJsonAsPrettyString(schemaPath), response.asPrettyString());
 
 				BaseClass.reportPassLog("Schema validation passed : " + schemaPath);
 				logger.info("Schema validation passed for schema: {}", schemaPath);
@@ -817,7 +818,59 @@ public class RestAPIUtil {
 		}
 	}
 
+	public static void validateErrorMessage(Response response, String entityType, String entityValue, SoftAssert softAssert) {
 
+		String expectedMsg="";
+		try {
+
+			String actual = response.jsonPath().getString("message");
+
+			int sc = response.getStatusCode();
+
+			if (actual == null || actual.isEmpty()) {
+				BaseClass.reportFailLog("Error message empty or null ", "validateErrorMessage");
+				softAssert.fail("Error message empty or null ");
+				return;
+			}
+
+			switch(sc) {
+
+			case 401:
+				expectedMsg = ApiErrorMessage.INVALID_BEARER_TOKEN.get();
+				break;
+			case 403:
+				expectedMsg = ApiErrorMessage.INSUFFICIENT_PRIVILEGE.get();
+				break;
+			case 415:
+				expectedMsg = ApiErrorMessage.INVALID_CONTENT_TYPE.get();
+				break;
+			case 400:
+				expectedMsg = ApiErrorMessage.INVALID_ENTITY_ID.format(entityType, entityValue);
+				break;
+			case 409:
+				break;
+			default:
+				break;
+			}
+
+			if(expectedMsg.isEmpty()) {
+				return;
+			}
+
+			if(actual.equals(expectedMsg)) {
+
+				BaseClass.reportPassLog("JSONPath 'message' validated successfully. " +
+						"Expected: " + expectedMsg + "'], Actual [" + actual + "]");
+			}
+
+
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog("Exception in validateErrorMessage → " + e.getMessage());
+			softAssert.fail("Exception in validateErrorMessage() → " + e.getMessage());
+		}
+
+	}
 
 }
 
