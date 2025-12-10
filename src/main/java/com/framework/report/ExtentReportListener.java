@@ -9,6 +9,7 @@ import org.testng.ITestListener;
 import org.testng.ITestResult;
 
 import com.framework.base.BaseClass;
+import com.framework.constant.Constant;
 import com.framework.utils.TimeUtil;
 import com.framework.utils.XLUtil;
 import com.framework.variables.ExecutionVariables;
@@ -32,9 +33,11 @@ public class ExtentReportListener implements ITestListener {
 	@Override
 	public void onStart(ITestContext context) {
 		ExecutionVariables.startTime = TimeUtil.getCurrentTime(timeformat, timezone);
-		ExecutionVariables.reportDocPath = XLUtil.createWorkBook(BaseClass.DIR_PATH+"/src/main/resources/reportdoc", ExecutionVariables.suitename, ".xlsx");
-		ReportDocument = ExecutionVariables.reportDocPath;
-		log.info("Execution status report doc path :: {}", ReportDocument);
+		if(Constant.REPORTDOC_FLAG) {
+			ExecutionVariables.reportDocPath = XLUtil.createWorkBook(BaseClass.DIR_PATH+"/src/main/resources/reportdoc", ExecutionVariables.suitename, ".xlsx");
+			ReportDocument = ExecutionVariables.reportDocPath;
+			log.info("Execution status report doc path :: {}", ReportDocument);
+		}
 	}
 
 	@Override

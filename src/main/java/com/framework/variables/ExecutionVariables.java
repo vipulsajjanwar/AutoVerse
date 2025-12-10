@@ -21,6 +21,8 @@ public class ExecutionVariables {
 	public static String issueKey= "";
 	
 	public static String reportDocPath =null;
+	
+	public static boolean reportDocFlag;
 
 	public static int currentRowNum = 1;
 	

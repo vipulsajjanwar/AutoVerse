@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
 
 import com.framework.base.BaseClass;
 import com.framework.constant.ApiConstants;
@@ -379,7 +380,7 @@ public class RestAPIUtil {
 				}
 
 				// support multiple expected alternatives separated by "||"
-				String[] expectedAlternatives = expectedValue.split("\\|\\|");
+				String[] expectedAlternatives = expectedValue.split("~~");
 
 				for (Object valObj : actualValues) {
 					String actual = valObj == null ? "" : valObj.toString();
@@ -451,24 +452,6 @@ public class RestAPIUtil {
 		return flag;
 	}
 
-	/**
-	 * Generic helper to convert three columns (possibly containing multiple delimited entries)
-	 * into the Map<String,String[]> validations.
-	 *
-	 * Accepts:
-	 *   jsonPathCol   -> raw string from Excel JSONPath column (supports multiple entries separated by "||")
-	 *   conditionCol  -> raw string from Excel condition column (supports multiple entries separated by "||")
-	 *   expectedCol   -> raw string from Excel expected value column (supports multiple entries separated by "||")
-	 *
-	 * Examples:
-	 *   jsonPathCol = "$[0].name||$..name"
-	 *   conditionCol = "EQUALS||CONTAINS"
-	 *   expectedCol = "Leanne Graham||Leanne"
-	 *
-	 * Returns a map:
-	 *   $[0].name -> [EQUALS, Leanne Graham]
-	 *   $..name   -> [CONTAINS, Leanne]
-	 */
 	public static Map<String, String[]> getValidationsFromExcel(
 			String jsonPathCol,
 			String conditionCol,
@@ -593,7 +576,7 @@ public class RestAPIUtil {
 		case "EQUALS":
 			return act.equalsIgnoreCase(exp);
 
-		case "IN":  // exp = "admin, user, manager"
+		case "IN":  
 			return Arrays.stream(exp.split(","))
 					.map(String::trim)
 					.anyMatch(a -> a.equalsIgnoreCase(act));
@@ -636,130 +619,204 @@ public class RestAPIUtil {
 	}
 
 
-	public static void validateUUID(Response response, String jsonPath) {
+	public static void validateUUID(Response response, String jsonPath, SoftAssert softAssert) {
 
-		List<String> values = extractValues(response, jsonPath);
+		try {
+			List<String> values = extractValues(response, jsonPath);
 
-		if (values.isEmpty()) {
-			throw new AssertionError("UUID value not found at path: " + jsonPath);
-		}
-
-		for (String raw : values) {
-			String cleaned = stripUUIDPrefix(raw);
-
-			try {
-				UUID.fromString(cleaned);
-				BaseClass.reportPassLog("Valid UUID at '" + jsonPath + "' : " + cleaned);
-			} catch (Exception e) {
-				BaseClass.reportFailLog("Invalid UUID at '" + jsonPath + "' → " + raw, "validateUUID");
-				throw new AssertionError("Invalid UUID at path: " + jsonPath + " → " + raw);
+			if (values.isEmpty()) {
+				BaseClass.reportFailLog("UUID value not found at path: " + jsonPath, "validateUUID");
+				softAssert.fail("UUID missing at: " + jsonPath);
+				return;
 			}
+
+			for (String raw : values) {
+				try {
+					String cleaned = stripUUIDPrefix(raw);
+					UUID.fromString(cleaned);
+
+					BaseClass.reportPassLog("Valid UUID at '" + jsonPath + "' : " + cleaned);
+
+				} catch (Exception e) {
+					BaseClass.reportFailLog("Invalid UUID at '" + jsonPath + "' → " + raw, "validateUUID");
+					softAssert.fail("Invalid UUID at path: " + jsonPath + " → " + raw);
+				}
+			}
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog("Exception in validateUUID: " + e.getMessage());
+			softAssert.fail("Exception in validateUUID() → " + e.getMessage());
 		}
 	}
 
 
+	public static SoftAssert validatePatten(Pattern pattern, String value, String regex, String jsonPath, SoftAssert softAssert) {
+		try {
+			boolean match = pattern.matcher(value).matches();
 
-	public static void validatePattern(Response response, String jsonPath, String regex) {
-
-		List<String> values = extractValues(response, jsonPath);
-
-		if (values.isEmpty()) {
-			throw new AssertionError("No value found at '" + jsonPath + "'");
-		}
-
-		Pattern pattern = Pattern.compile(regex);
-
-		for (String value : values) {
-			if (!pattern.matcher(value).matches()) {
-				BaseClass.reportFailLog("Pattern FAILED at '" + jsonPath +
-						"'. Expected: " + regex + " | Actual: " + value, "validatePattern");
-				throw new AssertionError("Pattern mismatch at '" + jsonPath + "' → " + value);
-			}
-
-			BaseClass.reportPassLog("Pattern PASSED at '" + jsonPath + "' Value: " + value);
-		}
-	}
-
-
-
-	public static void validateStringLength(Response response, String jsonPath, int min, int max) {
-
-		List<String> values = extractValues(response, jsonPath);
-
-		if (values.isEmpty()) {
-			throw new AssertionError(jsonPath + " is NULL or empty");
-		}
-
-		for (String value : values) {
-			if (value.length() < min || value.length() > max) {
-				BaseClass.reportFailLog(jsonPath + " length invalid. Expected " + min + "-" + max +
-						", Actual: " + value.length(), "validateStringLength");
-				throw new AssertionError("Invalid string length at '" + jsonPath + "'");
-			}
-
-			BaseClass.reportPassLog(
-					"String length PASSED at '" + jsonPath + "' Length: " + value.length());
-		}
-	}
-
-
-
-	public static void validateBoolean(Response response, String jsonPath) {
-
-		List<String> values = extractValues(response, jsonPath);
-
-		if (values.isEmpty()) {
-			throw new AssertionError("Boolean value missing at '" + jsonPath + "'");
-		}
-
-		for (String value : values) {
-			if (!"true".equalsIgnoreCase(value) && !"false".equalsIgnoreCase(value)) {
-				BaseClass.reportFailLog("Boolean FAILED at '" + jsonPath +
-						"'. Actual: " + value, "validateBoolean");
-				throw new AssertionError("Expected boolean at '" + jsonPath + "'");
-			}
-
-			BaseClass.reportPassLog("Boolean PASSED at '" + jsonPath + "' Value: " + value);
-		}
-	}
-
-
-
-	public static void validateDateFormat(Response response, String jsonPath, String format) {
-
-		List<String> values = extractValues(response, jsonPath);
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
-		sdf.setLenient(false);
-
-		if (values.isEmpty()) {
-			throw new AssertionError("Date missing at '" + jsonPath + "'");
-		}
-
-		for (String value : values) {
-			try {
-				sdf.parse(value);
-				BaseClass.reportPassLog("Date Format PASSED at '" + jsonPath + "'. Value: " + value);
-			} catch (Exception e) {
+			if (!match) {
 				BaseClass.reportFailLog(
-						"Date Format FAILED at '" + jsonPath +
-						"'. Expected: " + format + " | Actual: " + value,
-						"validateDateFormat");
-				throw new AssertionError("Invalid date at '" + jsonPath + "'");
+						"Pattern FAILED at '" + jsonPath + "'. Expected: " + regex + " | Actual: " + value,
+						"validatePattern"
+						);
+				softAssert.fail("Pattern mismatch at '" + jsonPath + "' → " + value);
+			} else {
+				BaseClass.reportPassLog("Pattern PASSED at '" + jsonPath + "' Value: " + value);
 			}
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog("Pattern exception → " + e.getMessage());
+			softAssert.fail("Exception while validating pattern at '" + jsonPath + "'");
+		}
+		return softAssert;
+	}
+
+	public static void validatePattern(Response response, String jsonPath, String regex, SoftAssert softAssert) {
+
+		try {
+			List<String> values = extractValues(response, jsonPath);
+
+			if (values.isEmpty()) {
+				BaseClass.reportFailLog("No value found at '" + jsonPath + "'", "validatePattern");
+				softAssert.fail("No value at '" + jsonPath + "'");
+				return;
+			}
+
+			Pattern pattern = Pattern.compile(regex);
+
+			for (String value : values) {
+
+				validatePatten(pattern, value, regex, jsonPath, softAssert);
+
+			}
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog("Exception in validatePattern: " + e.getMessage());
+			softAssert.fail("Exception in validatePattern() → " + e.getMessage());
 		}
 	}
 
 
-	public static void validateArrayNotEmpty(Response response, String jsonPath) {
-		List<?> list = response.jsonPath().getList(jsonPath);
 
-		if (list == null || list.isEmpty()) {
-			BaseClass.reportFailLog("Array empty or null → " + jsonPath, "validateArrayNotEmpty");
-			throw new AssertionError("Array '" + jsonPath + "' is empty or null.");
+	public static void validateStringLength(Response response, String jsonPath, int min, int max, SoftAssert softAssert) {
+
+		try {
+			List<String> values = extractValues(response, jsonPath);
+
+			if (values.isEmpty()) {
+				BaseClass.reportFailLog(jsonPath + " is NULL or empty", "validateStringLength");
+				softAssert.fail(jsonPath + " is NULL or empty");
+				return;
+			}
+
+			for (String value : values) {
+				try {
+					if (value.length() < min || value.length() > max) {
+						BaseClass.reportFailLog(
+								jsonPath + " length invalid. Expected " + min + "-" + max + ", Actual: " + value.length(),
+								"validateStringLength"
+								);
+						softAssert.fail("Invalid string length → " + jsonPath);
+					} else {
+						BaseClass.reportPassLog("String length PASSED at '" + jsonPath + "' Length: " + value.length());
+					}
+
+				} catch (Exception e) {
+					BaseClass.reportErrorLog("Length validation error → " + e.getMessage());
+					softAssert.fail("Exception while validating length at '" + jsonPath + "'");
+				}
+			}
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog("Exception in validateStringLength → " + e.getMessage());
+			softAssert.fail("Exception in validateStringLength() → " + e.getMessage());
 		}
-
-		BaseClass.reportPassLog("Array PASSED at '" + jsonPath + "' Size: " + list.size());
 	}
+
+	public static void validateBoolean(Response response, String jsonPath, SoftAssert softAssert) {
+
+		try {
+			List<String> values = extractValues(response, jsonPath);
+
+			if (values.isEmpty()) {
+				BaseClass.reportFailLog("Boolean value missing at '" + jsonPath + "'", "validateBoolean");
+				softAssert.fail("Boolean missing → " + jsonPath);
+				return;
+			}
+
+			for (String value : values) {
+				try {
+					boolean valid = value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false");
+
+					if (!valid) {
+						BaseClass.reportFailLog("Boolean FAILED at '" + jsonPath + "' Actual: " + value, "validateBoolean");
+						softAssert.fail("Invalid boolean at '" + jsonPath + "' → " + value);
+					} else {
+						BaseClass.reportPassLog("Boolean PASSED at '" + jsonPath + "' Value: " + value);
+					}
+
+				} catch (Exception e) {
+					BaseClass.reportErrorLog("Boolean validation error → " + e.getMessage());
+					softAssert.fail("Exception while validating boolean at '" + jsonPath + "'");
+				}
+			}
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog("Exception in validateBoolean → " + e.getMessage());
+			softAssert.fail("Exception in validateBoolean() → " + e.getMessage());
+		}
+	}
+
+
+	public static void validateDateFormat(Response response, String jsonPath, String format, SoftAssert softAssert) {
+
+		try {
+			List<String> values = extractValues(response, jsonPath);
+			SimpleDateFormat sdf = new SimpleDateFormat(format);
+			sdf.setLenient(false);
+
+			if (values.isEmpty()) {
+				BaseClass.reportFailLog("Date missing at '" + jsonPath + "'", "validateDateFormat");
+				softAssert.fail("Date missing → " + jsonPath);
+				return;
+			}
+
+			for (String value : values) {
+				try {
+					sdf.parse(value);
+					BaseClass.reportPassLog("Date Format PASSED at '" + jsonPath + "' Value: " + value);
+
+				} catch (Exception e) {
+					BaseClass.reportFailLog("Date FAILED at '" + jsonPath + "'. Expected: " + format + ", Actual: " + value,
+							"validateDateFormat");
+					softAssert.fail("Invalid date → " + jsonPath + " | value: " + value);
+				}
+			}
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog("Exception in validateDateFormat → " + e.getMessage());
+			softAssert.fail("Exception in validateDateFormat() → " + e.getMessage());
+		}
+	}
+
+	public static void validateArrayNotEmpty(Response response, String jsonPath, SoftAssert softAssert) {
+
+		try {
+			List<?> list = response.jsonPath().getList(jsonPath);
+
+			if (list == null || list.isEmpty()) {
+				BaseClass.reportFailLog("Array empty or null → " + jsonPath, "validateArrayNotEmpty");
+				softAssert.fail("Array empty or null → " + jsonPath);
+			} else {
+				BaseClass.reportPassLog("Array PASSED at '" + jsonPath + "' Size: " + list.size() + " Values" + list.toString());
+			}
+
+		} catch (Exception e) {
+			BaseClass.reportErrorLog("Exception in validateArrayNotEmpty → " + e.getMessage());
+			softAssert.fail("Exception in validateArrayNotEmpty() → " + e.getMessage());
+		}
+	}
+
 
 
 }

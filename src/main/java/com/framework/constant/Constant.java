@@ -112,5 +112,6 @@ public class Constant {
 	public static final long SESSION_RULE_WAIT =
 	        Long.parseLong(readconfig.getProperty("Session.ruleWait"));
 
-
+	public static final boolean REPORTDOC_FLAG =
+	        Boolean.parseBoolean(readconfig.getProperty("Reportdoc.enable"));
 }

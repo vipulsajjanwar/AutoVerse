@@ -6,6 +6,7 @@ D:\Home\AutoVerse\src\main\java\com\framework\utils\ReportUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\ai\WebServer.java
 D:\Home\AutoVerse\src\main\java\com\framework\ai\CodeGenWebApp.java
 D:\Home\AutoVerse\src\main\java\com\framework\integration\GenerativeAIUtil.java
+D:\Home\AutoVerse\src\main\java\com\framework\utils\MailUtil.java
 D:\Home\AutoVerse\src\main\java\com\automation\icedq\IcedqHomePage.java
 D:\Home\AutoVerse\src\main\java\com\framework\constant\SqlQueries.java
 D:\Home\AutoVerse\src\main\java\com\framework\ai\AIScriptGenerator.java
@@ -16,6 +17,7 @@ D:\Home\AutoVerse\src\main\java\com\framework\integration\EmailIntegration.java
 D:\Home\AutoVerse\src\main\java\com\framework\utils\ELKUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\constant\ApiConstants.java
 D:\Home\AutoVerse\src\main\java\com\framework\utils\BaseUtil.java
+D:\Home\AutoVerse\src\main\java\com\framework\enums\HttpMethod.java
 D:\Home\AutoVerse\src\main\java\com\framework\base\Launcher.java
 D:\Home\AutoVerse\src\main\java\com\framework\utils\TimeUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\pojo\ServerConfig.java
@@ -32,6 +34,7 @@ D:\Home\AutoVerse\src\main\java\com\framework\restassured\RestAPI.java
 D:\Home\AutoVerse\src\main\java\com\automation\icedq\AdminServiceAPI.java
 D:\Home\AutoVerse\src\main\java\com\framework\report\ExtentManager.java
 D:\Home\AutoVerse\src\main\java\com\framework\utils\DataIntegrityUtil.java
+D:\Home\AutoVerse\src\main\java\com\framework\utils\FileUtil.java
 D:\Home\AutoVerse\src\main\java\com\framework\integration\XrayIntegration.java
 D:\Home\AutoVerse\src\main\java\com\framework\constant\Constant.java
 D:\Home\AutoVerse\src\main\java\com\framework\enums\Pages.java

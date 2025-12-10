@@ -24,7 +24,7 @@
 									
 					<exclude name = "test_GenerateToken"/>
 					<include name = "test_CreateUserAPI"/>
-					<exclude name = "test_SearchUserAPI"/>
+					<include name = "test_SearchUserAPI"/>
 									
 				</methods>
 				
