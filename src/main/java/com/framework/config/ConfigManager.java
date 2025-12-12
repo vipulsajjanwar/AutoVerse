@@ -21,6 +21,14 @@ public class ConfigManager {
             throw new RuntimeException("Failed to load config file: " + filePath, e);
         }
     }
+    
+    public static void loadFromClasspath(String fileName) {
+        try {
+            properties.load(ConfigManager.class.getClassLoader().getResourceAsStream(fileName));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load config from classpath: " + fileName, e);
+        }
+    }
 
     /**
      * Get property as String
@@ -48,6 +56,14 @@ public class ConfigManager {
      */
     public static String getOrDefault(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
+    }
+    
+    public static String getDynamicString(String key, String replace, String value) {
+        String original = properties.getProperty(key);
+        if (original != null) {
+            return original.replace(replace, value);
+        }
+        return null;
     }
 
 }

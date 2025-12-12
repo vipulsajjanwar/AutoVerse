@@ -596,6 +596,17 @@ public class RestAPIUtil {
 		}
 	}
 	// ================= COMMON JSON VALUE EXTRACTOR =================
+	
+	public static <T> T getJsonPathValue(Response response, String jsonPath, Class<T> type) {
+	    try {
+	        jsonPath = jsonPath.replace("$.", "").replace("$", "").trim();
+	        return response.jsonPath().getObject(jsonPath, type);
+	    } catch (Exception e) {
+	        return null;
+	    }
+	}
+	
+	
 	private static List<String> extractValues(Response response, String jsonPath) {
 		Object raw = response.jsonPath().get(jsonPath);
 

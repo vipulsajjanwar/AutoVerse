@@ -1,4 +1,4 @@
-package com.automation.apitest;
+package com.automation.api.provider;
 
 import java.util.ArrayList;
 import java.util.List;

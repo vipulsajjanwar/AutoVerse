@@ -6,7 +6,7 @@
 
 	<parameter name="testType" value="api" />
 	<parameter name="browser" value="" />
-	<parameter name="applicationURL" value="https://192.168.100.35:32222/" />
+	<parameter name="applicationURL" value="http://192.168.100.35:42445/" />
 	<parameter name="userName" value="vipuls" />
 	<parameter name="password" value="Admin@123" />
 	<parameter name="executionKey" value="" />
@@ -23,14 +23,16 @@
 				<methods>
 									
 					<include name = "testGenerateToken"/>
-					<include name = "testCreateUserAPI"/>
-					<include name = "testRetrieveUserAPI"/>
-					<include name = "testUpdateUserAPI"/>
-					<include name = "testSearchUserAPI"/>
-					<include name = "testDeleteUserAPI"/>
+					<exclude name = "testCreateUserAPI"/>
+					<exclude name = "testRetrieveUserAPI"/>
+					<exclude name = "testUpdateUserAPI"/>
+					<exclude name = "testSearchUserAPI"/>
+					<exclude name = "testDeleteUserAPI"/>
 					
-					<include name = "testCreateGroupAPI"/>
-					<include name = "testRetrieveGroupAPI"/>
+					<exclude name = "testCreateGroupAPI"/>
+					<exclude name = "testRetrieveGroupAPI"/>
+					
+					<include name="test_AccountWorkspacesAPI"/>
 									
 				</methods>
 				

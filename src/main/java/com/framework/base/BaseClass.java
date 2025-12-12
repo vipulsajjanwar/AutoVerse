@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +46,7 @@ public class BaseClass {
 	public static final String buildId = System.getProperty("build.id", "index-v1");
 	public static WebDriver driver;
 
-	public static final String APIBASEURL = "http://192.168.100.35:42445/";
+	//public static final String APIBASEURL = ExecutionVariables.baseURL;
 	public static final String TOKENPATHPARAM = "auth/realms/icedq/protocol/openid-connect/token";
 
 	public static final String SCHEMAFOLDERPATH = BaseClass.DIR_PATH + "/src/test/resources/schemas/";
@@ -80,6 +81,7 @@ public class BaseClass {
 			ConfigManager.load(DIR_PATH +"/src/main/resources/config/constant.properties");
 
 			PageUtil.beforesuite(DIR_PATH + ConfigManager.getString("icedq.locators.folder.path"));
+				
 
 			ExecutionVariables.suitename = suiteName;
 			ExecutionVariables.testType =testType;

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,6 +14,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import io.restassured.response.Response;
 
 
 
@@ -136,11 +139,74 @@ public class JsonUtil {
 	}
 
 	public static String toPrettyJson(Object object) {
-	    try {
-	        ObjectMapper mapper = new ObjectMapper();
-	        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
-	    } catch (Exception e) {
-	        return "Failed to convert object to pretty JSON: " + e.getMessage();
-	    }
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+		} catch (Exception e) {
+			return "Failed to convert object to pretty JSON: " + e.getMessage();
+		}
+	}
+
+	// ---------------------------
+	// Single Value Extractors
+	// ---------------------------
+	public static String getString(Response response, String path) {
+		try {
+			return response.jsonPath().getString(path);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to read String at path: " + path, e);
+		}
+	}
+
+	public static Integer getInt(Response response, String path) {
+		try {
+			return response.jsonPath().getInt(path);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to read Integer at path: " + path, e);
+		}
+	}
+
+	public static Boolean getBoolean(Response response, String path) {
+		try {
+			return response.jsonPath().getBoolean(path);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to read Boolean at path: " + path, e);
+		}
+	}
+
+
+	// ---------------------------
+	// Single Object Extractor
+	// ---------------------------
+	public static <T> T getObject(Response response, String path, Class<T> cls) {
+		try {
+			return response.jsonPath().getObject(path, cls);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to map object at path: " + path, e);
+		}
+	}
+
+
+	// ---------------------------
+	// List Extractors (Basic Types)
+	// ---------------------------
+	public static <T> List<T> getList(Response response, String path, Class<T> cls) {
+		try {
+			return response.jsonPath().getList(path, cls);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to read List at path: " + path, e);
+		}
+	}
+
+
+	// ---------------------------
+	// List of Objects (POJO)
+	// ---------------------------
+	public static <T> List<T> getListOfObjects(Response response, String path, Class<T> cls) {
+		try {
+			return response.jsonPath().getList(path, cls);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to map list of objects at path: " + path, e);
+		}
 	}
 }

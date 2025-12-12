@@ -60,5 +60,7 @@ public class ExecutionVariables {
 	public static String buildType;
 	public static String releaseID;
 	public static String releaseType;
+	
+	public static String orgID;
 
 }

@@ -7,6 +7,9 @@ public class ApiConstants {
 	public static int statusCode;
 	
 	public static String applicationJson="application/json";
+	
+	static String workspaceId;
+	static String accountId;
 
 	public static String getAuthToken() {
         return authToken;
@@ -22,6 +25,22 @@ public class ApiConstants {
 
 	public static void setStatusCode(int statusCode) {
 		ApiConstants.statusCode = statusCode;
+	}
+
+	public static String getWorkspaceId() {
+		return workspaceId;
+	}
+
+	public static void setWorkspaceId(String WorkspaceId) {
+		workspaceId = WorkspaceId;
+	}
+
+	public static String getAccountId() {
+		return accountId;
+	}
+
+	public static void setAccountId(String AccountId) {
+		accountId = AccountId;
 	}
     
     

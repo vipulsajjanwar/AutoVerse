@@ -9,7 +9,8 @@ public enum FieldPattern {
 	GROUP_NAME("^[a-zA-Z0-9-_.@]+$"),
 	GROUP_DESCRIPTION("^$|^[a-zA-Z0-9-_., ]+$"),
     UUID("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"),
-    GENERIC_TEXT("^[a-zA-Z0-9-_., ]+$");
+    GENERIC_TEXT("^[a-zA-Z0-9-_., ]+$"),
+	DATEFORMAT_UTC("dd/MM/yyyy HH:mm:ss 'UTC'");
 
     private final String regex;
 
