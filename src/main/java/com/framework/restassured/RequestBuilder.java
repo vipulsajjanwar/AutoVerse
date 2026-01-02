@@ -2,16 +2,16 @@ package com.framework.restassured;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.framework.base.BaseClass;
-import com.framework.report.ExtentManager;
 import com.framework.utils.JsonUtil;
 import com.framework.utils.RestAPIUtil;
-import com.framework.variables.ExecutionVariables;
+
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -35,6 +35,8 @@ public class RequestBuilder {
 		Response response = null;
 
 		try {
+			logger.info("=================================== START REST API =============================================");
+			logger.info("");
 			BaseClass.reportLog(method + " Request URL => " + url);
 			logger.info("{} Request: {}", method, url);
 
@@ -54,7 +56,8 @@ public class RequestBuilder {
 			if (body != null && !method.equalsIgnoreCase("GET") && !method.equalsIgnoreCase("DELETE")) {
 				BaseClass.reportLog("Request Body:");
 				BaseClass.reportCodeLog(JsonUtil.toPrettyJson(body));
-				logger.info("Body: {}", body);
+				Optional.ofNullable(body)
+				.ifPresent(b -> logger.info("Body:\n{}", JsonUtil.toPrettyJson(b)));
 
 				Object serializedBody = serializeBody(body, contentType);
 				req.body(serializedBody);
@@ -74,6 +77,8 @@ public class RequestBuilder {
 			// ---------------- Log Response ----------------
 			response.then().log().all();
 			logResponse(response);
+			logger.info("");
+			logger.info("=================================== END REST API =============================================");
 
 		} catch (Exception e) {
 			BaseClass.reportErrorLog(e.getMessage());
@@ -81,6 +86,17 @@ public class RequestBuilder {
 		}
 
 		return response;
+	}
+
+	private static String formatHeaders(Map<String, String> headers) {
+		StringBuilder sb = new StringBuilder();
+		headers.forEach((key, value) ->
+		sb.append(key)
+		.append(" : ")
+		.append(value)
+		.append(System.lineSeparator())
+				);
+		return sb.toString();
 	}
 
 	private static RequestSpecification applyHeaders(RequestSpecification req,
@@ -115,8 +131,10 @@ public class RequestBuilder {
 
 		// Log headers in Extent
 		BaseClass.reportLog("Request Headers:");
-		BaseClass.reportCodeLog(headerLogMap.toString());
-		logger.info("Request Headers: {}", headerLogMap);
+
+		String headerLog=formatHeaders(headerLogMap);
+		BaseClass.reportCodeLog(headerLog);
+		logger.info("Request Headers: \n{}", headerLog);
 
 		return req;
 	}
@@ -189,13 +207,13 @@ public class RequestBuilder {
 			logger.error("API returned error code: {}", statusCode);
 		}
 	}
-	
+
 	public static String getDynamicEndpoints(String url, String stringToBeReplaced, String dynamicValue) {
 
 		return url.replace(stringToBeReplaced, dynamicValue);
 
 	}
-	
+
 	public static String getQueryParameter(String queryParam) {
 
 		if(queryParam!=null && !queryParam.trim().isEmpty()) {
@@ -205,98 +223,98 @@ public class RequestBuilder {
 			return "";
 		}
 	}
-	
+
 	// --------------------- HTTP helpers -------------------------
 
-    public Response get(String url, String token, Map<String, String> extraHeaders, String contentType) {
-        BaseClass.reportLog("GET Request URL => " + url);
-        logger.info("GET Request: {}", url);
+	public Response get(String url, String token, Map<String, String> extraHeaders, String contentType) {
+		BaseClass.reportLog("GET Request URL => " + url);
+		logger.info("GET Request: {}", url);
 
-        RequestSpecification req = RestAssured.given();
-        applyHeaders(req, token, extraHeaders, contentType);
+		RequestSpecification req = RestAssured.given();
+		applyHeaders(req, token, extraHeaders, contentType);
 
-        Response response = req.when()
-                .get(url)
-                .then()
-                .log().all()
-                .extract().response();
+		Response response = req.when()
+				.get(url)
+				.then()
+				.log().all()
+				.extract().response();
 
-        logResponse(response);
-        return response;
-    }
+		logResponse(response);
+		return response;
+	}
 
-    public static Response post(String url, Object body, String token, Map<String, String> extraHeaders, String contentType) {
-        Response response = null;
-        try {
-            BaseClass.reportLog("POST Request URL => " + url);
-            logger.info("POST Request: {}", url);
-            
-            RequestSpecification req = RestAssured.given();
-            applyHeaders(req, token, extraHeaders, contentType);
+	public static Response post(String url, Object body, String token, Map<String, String> extraHeaders, String contentType) {
+		Response response = null;
+		try {
+			BaseClass.reportLog("POST Request URL => " + url);
+			logger.info("POST Request: {}", url);
 
-            if (body != null) {
-                BaseClass.reportLog("Request Body :");
-                BaseClass.reportCodeLog(JsonUtil.toPrettyJson(body));
-                logger.info("Body: {}", body);
-            } else {
-                BaseClass.reportLog("Request Body : null");
-            }
-            body = serializeBody(body, contentType);
-        
-            response = req.body(body)
-                    .when()
-                    .post(url)
-                    .then()
-                    .log().all()
-                    .extract().response();
+			RequestSpecification req = RestAssured.given();
+			applyHeaders(req, token, extraHeaders, contentType);
 
-            logResponse(response);
+			if (body != null) {
+				BaseClass.reportLog("Request Body :");
+				BaseClass.reportCodeLog(JsonUtil.toPrettyJson(body));
+				logger.info("Request Body:  {}", body);
+			} else {
+				BaseClass.reportLog("Request Body : null");
+			}
+			body = serializeBody(body, contentType);
 
-        } catch (Exception e) {
-            BaseClass.reportErrorLog(e.getMessage());
-            logger.error("Exception occur while post request: {}", e.getMessage(), e);
-        }
-        return response;
-    }
+			response = req.body(body)
+					.when()
+					.post(url)
+					.then()
+					.log().all()
+					.extract().response();
 
-    public Response put(String url, Object body, String token, Map<String, String> extraHeaders, String contentType) {
-        BaseClass.reportLog("PUT Request URL => " + url);
-        BaseClass.reportCodeLog("Request Body => " + body);
-        logger.info("PUT Request: {}", url);
-        logger.info("Body: {}", body);
+			logResponse(response);
 
-        RequestSpecification req = RestAssured.given();
-        applyHeaders(req, token, extraHeaders, contentType);
-        
-        body = serializeBody(body, contentType);
+		} catch (Exception e) {
+			BaseClass.reportErrorLog(e.getMessage());
+			logger.error("Exception occur while post request: {}", e.getMessage(), e);
+		}
+		return response;
+	}
 
-        Response response = req.body(body)
-                .when()
-                .put(url)
-                .then()
-                .log().all()
-                .extract().response();
+	public Response put(String url, Object body, String token, Map<String, String> extraHeaders, String contentType) {
+		BaseClass.reportLog("PUT Request URL => " + url);
+		BaseClass.reportCodeLog("Request Body => " + body);
+		logger.info("PUT Request: {}", url);
+		logger.info("Request Body: {}", body);
 
-        logResponse(response);
-        return response;
-    }
+		RequestSpecification req = RestAssured.given();
+		applyHeaders(req, token, extraHeaders, contentType);
 
-    public Response delete(String url, String token, Map<String, String> extraHeaders, String contentType) {
-        BaseClass.reportLog("DELETE Request URL => " + url);
-        logger.info("DELETE Request: {}", url);
+		body = serializeBody(body, contentType);
 
-        RequestSpecification req = RestAssured.given();
-        applyHeaders(req, token, extraHeaders, contentType);
+		Response response = req.body(body)
+				.when()
+				.put(url)
+				.then()
+				.log().all()
+				.extract().response();
 
-        Response response = req.when()
-                .delete(url)
-                .then()
-                .log().all()
-                .extract().response();
+		logResponse(response);
+		return response;
+	}
 
-        logResponse(response);
-        return response;
-    }
-	
-	
+	public Response delete(String url, String token, Map<String, String> extraHeaders, String contentType) {
+		BaseClass.reportLog("DELETE Request URL => " + url);
+		logger.info("DELETE Request: {}", url);
+
+		RequestSpecification req = RestAssured.given();
+		applyHeaders(req, token, extraHeaders, contentType);
+
+		Response response = req.when()
+				.delete(url)
+				.then()
+				.log().all()
+				.extract().response();
+
+		logResponse(response);
+		return response;
+	}
+
+
 }

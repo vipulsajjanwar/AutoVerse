@@ -3,6 +3,7 @@ package com.framework.restassured;
 import java.util.Map;
 
 import com.framework.base.BaseClass;
+import com.framework.utils.RestAPIUtil;
 
 import io.restassured.response.Response;
 
@@ -54,7 +55,18 @@ public class ResponseValidator {
 	        throw new RuntimeException("schemaFileName is required for non-error responses.");
 	    }
 
-	    return basePath + "admin/" + schemaFileName;
+	    return basePath + schemaFileName;
+	}
+	
+	public static void validateConnectionResponseMessage(Response response, String expectedMessage) {
+		
+		// JSON path validations from Excel
+        Map<String, String[]> jsonPathValidate = RestAPIUtil.getValidationsFromExcel(
+                "message",
+                "equals",
+                expectedMessage
+        );
+        RestAPIUtil.validateJsonPath(response, jsonPathValidate);
 	}
 
 }
